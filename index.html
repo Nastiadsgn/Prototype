@@ -214,13 +214,16 @@
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
       padding: 1rem;
     }
-    .wb-setup-progress { flex-shrink: 0; }
+    .wb-setup-progress { flex-shrink: 0; width: 100%; }
     .wb-artifact-area {
       flex: 1;
       min-height: 0;
+      width: 100%;
       overflow-y: auto;
     }
+    .wb-artifact-area > * { width: 100%; }
     .wb-artifact-placeholder {
+      width: 100%;
       min-height: 12rem;
       display: flex;
       align-items: center;
@@ -1225,7 +1228,7 @@
         <button data-action="open-doc" data-doc="pipeline-health" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🛡️</span><p class="text-sm font-bold mt-3">Reliable pipelines</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Auto-fixed freshness breach</p></button>`
       : `<button data-action="open-doc" data-doc="kpi-weekly" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🎯</span><p class="text-sm font-bold mt-3">Keep KPIs healthy</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Flagged Day-7 retention drop</p></button>
         <button data-action="open-doc" data-doc="pipeline-health" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🛡️</span><p class="text-sm font-bold mt-3">Reliable pipelines</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Auto-fixed freshness breach</p></button>`;
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-4xl mx-auto">
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full">
       <h1 class="text-2xl font-bold text-zinc-900 mb-1">${greeting}, Sam 👋</h1>
       <p class="text-sm text-zinc-400 mb-8">${userGoal ? `Your "${esc(userGoal.goal)}" goal is live — here's what your team handled while you were away.` : "Here's what your team handled while you were away."}</p>
       ${state.wb.doneNeeds.length < NEEDS_YOU.length ? `<div class="mb-8"><div class="flex items-center gap-2 mb-3"><h2 class="text-sm font-semibold">Waiting on you</h2></div><div class="space-y-2.5">${needs}</div></div>` : ""}
@@ -1250,7 +1253,7 @@
           <span class="text-xs text-violet-600 bg-violet-50 rounded-full px-2 py-0.5 ml-auto">Shared library · any agent can iterate</span>
         </div>`
       : "";
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl overflow-y-auto min-h-0 flex-1">
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full overflow-y-auto min-h-0 flex-1">
       ${assetBanner}
       <div class="flex items-start justify-between mb-1"><h1 class="text-2xl font-bold text-zinc-900">${esc(d.title)}</h1><div class="flex items-center gap-1.5 text-xs text-zinc-400">${ICON.clock}<span>Updated ${esc(d.updated)} by ${esc(d.agent)}</span></div></div>
       <p class="text-[11px] text-zinc-400 mb-3">Click any section to add it as chat context</p>
@@ -1267,12 +1270,12 @@
   function renderWiki() {
     const folder = KB_FOLDERS.find(f => f.id === state.wb.openWiki) || KB_FOLDERS[0];
     if (!folder) {
-      return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+      return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full">
         <p class="text-sm text-zinc-400 py-12 text-center">Agents will publish reports, dashboards, and trackers here.</p>
       </div></div></div>`;
     }
     const assets = folderAssets(folder.id);
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl overflow-y-auto min-h-0 flex-1">
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full overflow-y-auto min-h-0 flex-1">
       <h1 class="text-2xl font-bold mb-2"><span>${folder.icon}</span> ${esc(folder.title)}</h1>
       ${folder.goal ? `<p class="text-xs text-violet-600 bg-violet-50 inline-block rounded-full px-2.5 py-0.5 mb-3">Goal: ${esc(folder.goal)}</p>` : ""}
       <p class="text-sm text-zinc-600 leading-relaxed">${esc(folder.intro || "Agent-produced assets — shared across the fleet.")}</p>
@@ -1352,7 +1355,7 @@
   function renderProfiles() {
     const w = state.wb;
     const names = Object.keys(PROFILES);
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-4xl mx-auto">
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full">
       <div class="flex items-start justify-between mb-2">
         <div>
           <h1 class="text-2xl font-bold text-zinc-900">Teammate profiles</h1>
@@ -1682,7 +1685,7 @@
         ? `<div class="text-center py-12 border border-dashed border-zinc-200 rounded-2xl"><p class="text-sm text-zinc-400">No sessions yet — start a conversation in the chat panel.</p></div>`
         : `<div class="space-y-2">${msgs.slice(-5).map(m=>`<div class="rounded-xl border border-zinc-200 px-4 py-3 ${m.role==="user"?"bg-zinc-50":""}"><p class="text-[10px] font-semibold text-zinc-400 uppercase mb-1">${m.role==="user"?"You":name}</p><p class="text-sm text-zinc-700">${esc(m.content)}</p></div>`).join("")}</div>`;
     }
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full">
       <div class="flex items-center gap-3 mb-1">
         <span class="text-2xl">${a.emoji}</span>
         <h1 class="text-2xl font-bold">${esc(name)}</h1>
