@@ -795,9 +795,9 @@
       <div class="px-3 pb-1"><button data-action="go-home" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="home"?"bg-zinc-200/60 font-medium":"text-zinc-600 hover:bg-zinc-100"}"><span>🏠</span><span class="text-sm sidebar-label">Home</span></button></div>
       <div class="px-3 pb-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Goals</p>
         <div class="px-2 py-1.5 text-sm font-medium flex gap-2"><span>🎯</span><span class="truncate sidebar-label">Keep KPIs healthy</span></div>
-        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["kpi-monitoring","kpi-weekly","retention"].includes(d.id)).map(docBtn).join("")}</div>
+        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["kpi-monitoring","kpi-weekly"].includes(d.id)).map(docBtn).join("")}</div>
         <div class="px-2 py-1.5 text-sm font-medium flex gap-2 mt-1"><span>🛡️</span><span class="truncate sidebar-label">Reliable pipelines</span></div>
-        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["pipeline-health","metric-defs"].includes(d.id)).map(docBtn).join("")}</div>
+        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["pipeline-health"].includes(d.id)).map(docBtn).join("")}</div>
       </div>
       <div class="px-3 pb-2 mt-2"><div class="flex items-center justify-between px-2 mb-1"><p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest sidebar-section-title">Teammates</p></div>
         ${Object.entries(PROFILES).map(([name,a])=>`<button data-action="open-agent" data-agent="${name}" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="agent"&&w.openAgent===name?"bg-zinc-200/60 font-medium":"text-zinc-700 hover:bg-zinc-100"}"><span>${a.emoji}</span><span class="text-sm sidebar-label flex-1 truncate">${name}</span></button>`).join("")}
