@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Databao</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Fallback styles — page works even if Tailwind CDN doesn't load */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { background: #fafafa; color: #18181b; font-family: ui-sans-serif, system-ui, sans-serif; }
+    #app { min-height: 100%; }
+    .flex { display: flex; }
+    .inline-flex { display: inline-flex; }
+    .flex-col { flex-direction: column; }
+    .flex-1 { flex: 1; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-end { justify-content: flex-end; }
+    .gap-2 { gap: .5rem; }
+    .gap-3 { gap: .75rem; }
+    .shrink-0 { flex-shrink: 0; }
+    .h-8 { height: 2rem; }
+    .flex-wrap { flex-wrap: wrap; }
+    .h-screen { min-height: 100vh; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-y-auto { overflow-y: auto; }
+    .text-center { text-align: center; }
+    .text-sm { font-size: .875rem; }
+    .text-xs { font-size: .75rem; }
+    .text-3xl { font-size: 1.875rem; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .leading-none { line-height: 1; }
+    .text-zinc-400 { color: #a1a1aa; }
+    .text-zinc-600 { color: #52525b; }
+    .text-zinc-700 { color: #3f3f46; }
+    .text-zinc-800 { color: #27272a; }
+    .text-zinc-900 { color: #18181b; }
+    .text-white { color: #fff; }
+    .bg-white { background: #fff; }
+    .bg-zinc-50 { background: #fafafa; }
+    .bg-zinc-100 { background: #f4f4f5; }
+    .bg-violet-500 { background: #8b5cf6; }
+    .rounded-xl { border-radius: .75rem; }
+    .rounded-2xl { border-radius: 1rem; }
+    .rounded-md { border-radius: .375rem; }
+    .rounded-full { border-radius: 9999px; }
+    .border { border: 1px solid #e4e4e7; }
+    .border-zinc-200 { border-color: #e4e4e7; }
+    .shadow-sm { box-shadow: 0 1px 2px rgb(0 0 0 / .05); }
+    .p-6 { padding: 1.5rem; }
+    .p-10 { padding: 2.5rem; }
+    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .px-4\.5 { padding-left: 1.125rem; padding-right: 1.125rem; }
+    .py-3 { padding-top: .75rem; padding-bottom: .75rem; }
+    .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+    .mb-3 { margin-bottom: .75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-7 { margin-bottom: 1.75rem; }
+    .max-w-lg { max-width: 32rem; }
+    .max-w-sm { max-width: 24rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .w-full { width: 100%; }
+    .cursor-pointer { cursor: pointer; }
+    button { font: inherit; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    textarea, input { font: inherit; border: none; }
+    @keyframes db-bounce { 0%,80%,100%{transform:translateY(0);opacity:.3} 40%{transform:translateY(-4px);opacity:1} }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .dot { animation: db-bounce 1.1s infinite; }
+    .dot:nth-child(2) { animation-delay: .18s; }
+    .dot:nth-child(3) { animation-delay: .36s; }
+    .spinner { animation: spin .8s linear infinite; }
+
+    /* Workbench: chat + content 50/50, responsive */
+    .wb-split {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    @media (min-width: 768px) {
+      .wb-split { flex-direction: row; }
+    }
+    .wb-pane {
+      flex: 1 1 50%;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .wb-chat-shell {
+      padding: 1rem 0.75rem 1rem 0.5rem;
+      height: 100%;
+      min-height: 0;
+    }
+    .wb-chat-card {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .wb-pane-content {
+      height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .wb-sidebar {
+      width: 15rem;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: #fafafa;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    @media (max-width: 767px) {
+      .wb-sidebar { width: 3.5rem; }
+      .wb-sidebar .sidebar-label { display: none; }
+      .wb-sidebar .sidebar-section-title { display: none; }
+      .wb-sidebar .sidebar-nested { margin-left: 0; border: none; padding-left: 0; }
+    }
+    .grid-cols-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+    .grid-cols-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+    @media (max-width: 767px) {
+      .grid-cols-2 { grid-template-columns: 1fr; }
+      .grid-cols-3 { grid-template-columns: 1fr; }
+    }
+    .landing-panel {
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .landing-inner {
+      width: 100%;
+      max-width: 32rem;
+    }
+    .landing-input-row {
+      width: 100%;
+      max-width: 24rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .min-w-0 { min-width: 0; }
+    .h-full { height: 100%; }
+    @keyframes ob-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+    .ob-skel { background: #f4f4f5; animation: ob-pulse 2s ease-in-out infinite; }
+    .space-y-1\.5 > * + * { margin-top: .375rem; }
+    .space-y-2 > * + * { margin-top: .5rem; }
+  </style>
+</head>
+<body class="bg-zinc-50">
+  <noscript><p style="padding:2rem">JavaScript is required. Enable it and reload.</p></noscript>
+  <div id="app"><p style="padding:2rem;color:#71717a">Loading Databao…</p></div>
+  <script>
+(function () {
+  const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const cn = (...c) => c.filter(Boolean).join(" ");
+
+  const LOGO = (size=28) => `<svg width="${size}" height="${size}" viewBox="0 0 500 500" fill="none" style="flex-shrink:0"><path d="M276.733 140.669C295.862 127.455 318.256 118.562 342.403 115.369C353.378 113.919 362.392 123.037 362.392 134.112V177.067C346.446 177.067 331.621 181.234 318.921 188.453C314.472 190.982 315.57 197.33 320.393 199.041C380.416 218.699 439.425 258.714 448.436 313.854C457.447 368.994 426.958 413 371.606 413H128.394C73.0423 413 42.5534 368.994 51.5641 313.854C60.5751 258.714 119.583 218.699 179.606 199.041C184.429 197.33 185.528 190.982 181.079 188.453C168.379 181.234 153.554 177.067 137.608 177.067V134.112C137.608 123.037 146.621 113.919 157.595 115.369C181.743 118.562 204.138 127.455 223.267 140.669V87.0001H276.733V140.669Z" fill="#7E42FF"/><path d="M254.73 298.872C254.73 311.526 244.477 321.785 231.829 321.785C219.181 321.785 208.927 311.526 208.927 298.872C208.927 286.217 219.181 275.959 231.829 275.959C244.477 275.959 254.73 286.217 254.73 298.872Z" fill="white"/><path d="M380.687 298.872C380.687 311.526 370.434 321.785 357.786 321.785C345.138 321.785 334.884 311.526 334.884 298.872C334.884 286.217 345.138 275.959 357.786 275.959C370.434 275.959 380.687 286.217 380.687 298.872Z" fill="white"/></svg>`;
+  const ICON = {
+    check: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>`,
+    arrow: `<svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>`,
+    mic: `<svg class="w-4 h-4 text-zinc-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>`,
+    clock: `<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+    sparkles: `<svg class="w-3.5 h-3.5 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8L4 12l6.1 3.2L12 21l1.9-5.8L20 12l-6.1-3.2Z"/></svg>`,
+    alert: `<svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`,
+    trend: `<svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>`,
+    file: `<svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>`,
+    edit: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
+  };
+
+  const SCRIPT = [
+    { reply: "Good place to start — and there's usually more behind it. How long does pulling that together take you right now?", suggestions: ["10–15 minutes", "A couple hours", "Half a day"], artifact: { planStep: 1, tasks: [{ label: "KPI Monitoring", detail: "recurring · time TBD" }] } },
+    { reply: "That adds up fast. Where does the data live — a warehouse like Snowflake, or spreadsheets?", suggestions: ["Snowflake", "BigQuery", "Spreadsheets"], artifact: { planStep: 1, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · ~1+ hr · weekly" }] } },
+    { reply: "Let me pull up the connection form.", ui: (t) => ({ type: "connectionForm", tool: t || "Snowflake" }), artifact: { planStep: 1, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · ~1+ hr · weekly" }] } },
+    { reply: "Here's what I'll set up. Take a look — you can tweak it or confirm.", planCard: { goal: "Keep KPIs healthy", agentName: "Florence", source: "Snowflake", tasks: [{ label: "Weekly KPI monitoring", detail: "Revenue & churn · every Monday" }, { label: "Early warnings", detail: "Alert when a metric moves sharply" }] }, artifact: { planStep: 2, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · from Snowflake · weekly" }] } },
+    { reply: "Sure — what would you like to change? You can adjust the tasks, the schedule, or the data source.", suggestions: ["Actually, it's good — confirm", "Change the schedule"], artifact: { planStep: 2, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · from Snowflake · weekly" }] } },
+  ];
+
+  const DOCUMENTS = [
+    { id: "kpi-monitoring", title: "KPI Monitoring", freshness: "just now", agent: "Florence", status: "fresh", badge: "New" },
+    { id: "kpi-weekly", title: "Weekly KPI Report", freshness: "12 min ago", agent: "Florence", status: "fresh", badge: "2 new findings" },
+    { id: "retention", title: "Retention Deep-Dive", freshness: "1 hr ago", agent: "Florence", status: "fresh", badge: null },
+    { id: "pipeline-health", title: "Pipeline Health", freshness: "3 min ago", agent: "Ada", status: "attention", badge: "1 issue auto-fixed" },
+    { id: "metric-defs", title: "Metric Definitions", freshness: "2 days ago", agent: "Florence", status: "stable", badge: null },
+  ];
+  const PROFILES = {
+    Florence: {
+      emoji: "👩‍💻", role: "KPIs & reports", docs: ["kpi-monitoring", "kpi-weekly", "retention"], tasks: 2,
+      soul: "Own KPI monitoring, weekly reports, and retention analysis. Flag anomalies early and draft stakeholder-ready summaries.",
+      tags: ["KPI monitoring", "Retention analysis", "Weekly reports", "Anomaly detection", "Stakeholder summaries"],
+      persona: {
+        tone: "Clear and direct — leads with the number, then context. Flags risks early without alarmism.",
+        skills: [
+          { name: "KPI monitoring", desc: "Tracks MRR, churn, and retention with anomaly detection and week-over-week trend analysis." },
+          { name: "Cohort analysis", desc: "Builds Day-7/Day-30 retention curves and compares cohorts across product changes." },
+          { name: "Stakeholder reporting", desc: "Drafts executive-ready weekly summaries and Slack alert copy for #data-alerts." },
+          { name: "Anomaly detection", desc: "Spots sharp metric moves, correlates with deploys and experiments, and recommends next steps." },
+        ],
+        responsibilities: ["Weekly KPI report every Monday 08:00", "Retention deep-dives on request", "Proactive alerts when metrics cross thresholds", "Metric definition validation against the semantic layer"],
+        boundaries: "Doesn't modify pipelines or warehouse schemas — escalates data quality and freshness issues to Ada.",
+        tools: ["Snowflake", "Slack", "Google analytics"],
+      },
+      status: "online", gateway: 8642, sessions: 12, isDefault: true,
+      config: { provider: "Anthropic", model: "claude-sonnet-4", sources: ["Snowflake"], integrations: ["Slack", "dbt"] },
+    },
+    Ada: {
+      emoji: "🧑‍💻", role: "Pipeline health", docs: ["pipeline-health", "metric-defs"], tasks: 3,
+      soul: "Watch warehouse freshness, dbt tests, and schema drift. Auto-remediate when safe; escalate when not.",
+      tags: ["Pipeline health", "dbt tests", "Schema drift", "Auto-remediation", "Freshness SLAs", "dbt Cloud"],
+      persona: {
+        tone: "Technical and precise — documents root cause before proposing fixes. Prefers runbooks over improvisation.",
+        skills: [
+          { name: "Pipeline health", desc: "Monitors dbt model freshness, test failures, and warehouse job status across all critical paths." },
+          { name: "Schema drift detection", desc: "Catches new columns, type changes, and null-rate spikes in dimension tables overnight." },
+          { name: "Auto-remediation", desc: "Re-runs stale models and fixes safe freshness breaches without human intervention." },
+          { name: "Semantic layer", desc: "Maintains canonical metric definitions and syncs with the dbt semantic layer." },
+        ],
+        responsibilities: ["24/7 pipeline freshness monitoring", "dbt test triage and auto-fix when safe", "Schema drift logging and ticket creation", "Metric definition ownership and drift checks"],
+        boundaries: "Doesn't draft stakeholder-facing reports or interpret business KPIs — hands off to Florence for narrative and analysis.",
+        tools: ["Hubspot", "PagerDuty"],
+      },
+      status: "online", gateway: 8643, sessions: 8, isDefault: false,
+      config: { provider: "Anthropic", model: "claude-sonnet-4", sources: ["Snowflake", "dbt Cloud"], integrations: ["PagerDuty"] },
+    },
+  };
+  const AGENTS = PROFILES;
+  const WIKI_PAGES = [
+    { id: "overview", icon: "📖", title: "Overview · how to use this memory" },
+    { id: "semantic", icon: "📐", title: "Semantic layer" },
+    { id: "entities", icon: "🔗", title: "Entities & relationships" },
+    { id: "sources", icon: "🗄️", title: "Data sources & ownership" },
+    { id: "conventions", icon: "⚠️", title: "Conventions & gotchas" },
+    { id: "stakeholders", icon: "📅", title: "Stakeholders & cadences" },
+    { id: "glossary", icon: "🔤", title: "Glossary" },
+    { id: "runbooks", icon: "📋", title: "Runbooks / SLAs" },
+  ];
+  const DOC_CONTENT = {
+    "kpi-monitoring": { title: "KPI Monitoring", agent: "Florence", updated: "just now", subtitle: "Your new goal · configured from onboarding · reading from Snowflake", feed: [{ action: "connected to Snowflake and mapped your revenue & churn tables", time: "just now" }, { action: "set up weekly monitoring — first report drafts Monday 08:00", time: "just now" }, { action: "validated metrics against your canonical definitions", time: "just now" }], summary: "This is your first goal, just set up. I'll watch your core KPIs — revenue and churn — and draft a report every Monday.", metrics: [{ metric: "Revenue (MRR)", value: "$142.3K", change: "tracking", dir: "up", spark: [40,42,41,44,45,44,47] }, { metric: "Churn Rate", value: "3.1%", change: "tracking", dir: "up", spark: [2.8,2.9,2.9,3.0,2.9,3.0,3.1] }], annotation: { topic: "what happens next", text: "I'm live now. Your first full report lands Monday at 08:00." }, watching: ["Revenue (MRR) — weekly, alert on sharp moves", "Churn rate — alert if it crosses 3.5%", "First report scheduled · Monday 08:00"] },
+    "kpi-weekly": { title: "Weekly KPI Report", agent: "Florence", updated: "12 min ago", subtitle: "Week 27 · Jul 1 – Jul 7, 2026 · auto-refreshed from Snowflake", feed: [{ action: "refreshed all KPI figures from Snowflake", time: "12 min ago" }, { action: "flagged Day-7 retention drop", time: "12 min ago" }], summary: "Revenue continues its steady climb at +2.1% week-over-week, now at $142.3K MRR. The main concern is Day-7 retention, down 14%.", metrics: [{ metric: "Revenue (MRR)", value: "$142.3K", change: "+2.1%", dir: "up", spark: [40,42,41,44,45,44,47] }, { metric: "Day-7 Retention", value: "31.2%", change: "-14%", dir: "down", flagged: true, spark: [45,44,46,43,38,34,31] }, { metric: "Weekly Active Users", value: "8,412", change: "+4.8%", dir: "up", spark: [60,62,61,65,68,70,72] }, { metric: "Churn Rate", value: "3.1%", change: "+0.2pp", dir: "down", spark: [2.8,2.9,2.9,3.0,2.9,3.0,3.1] }], annotation: { topic: "Day-7 retention drop", text: "The drop correlates with the onboarding flow change deployed Nov 28." }, watching: ["Retention cohorts post-Nov 28", "Churn rate — alert if it crosses 3.5%"] },
+    "retention": { title: "Retention Deep-Dive", agent: "Florence", updated: "1 hr ago", subtitle: "Cohort analysis · Nov 2025 – Jul 2026", feed: [{ action: "rebuilt Day-7 cohort curves", time: "1 hr ago" }], summary: "Day-7 retention held near 45% until late November, then fell to 31%.", metrics: [{ metric: "Day-7 Retention", value: "31.2%", change: "-14%", dir: "down", flagged: true, spark: [45,44,46,43,38,34,31] }], annotation: { topic: "modal impact", text: "Users who saw the new modal completed activation at a 22% lower rate." }, watching: ["Post-Nov 28 cohorts — daily"] },
+    "pipeline-health": { title: "Pipeline Health", agent: "Ada", updated: "3 min ago", subtitle: "dbt + warehouse freshness · live status", feed: [{ action: "auto-fixed fct_orders_daily freshness breach", time: "3 min ago" }], summary: "All critical models are fresh. One schema drift in dim_customers is logged.", metrics: [{ metric: "Models Fresh", value: "48 / 48", change: "100%", dir: "up", spark: [46,47,45,48,48,47,48] }, { metric: "Tests Passing", value: "312 / 314", change: "-2", dir: "down", spark: [314,314,313,314,312,313,312] }], annotation: { topic: "schema drift", text: "A new nullable column appeared in dim_customers overnight." }, watching: ["fct_orders_daily freshness", "dim_customers schema"] },
+    "metric-defs": { title: "Metric Definitions", agent: "Ada", updated: "2 days ago", subtitle: "Canonical semantic layer", feed: [{ action: "synced definitions with dbt semantic layer", time: "2 days ago" }], summary: "Canonical reference every agent reads before computing a metric.", metrics: [{ metric: "Defined Metrics", value: "34", change: "+2", dir: "up", spark: [30,31,31,32,32,33,34] }], annotation: { topic: "activation definition", text: "Activation = 3+ core actions within 7 days of signup." }, watching: ["Definition drift between teams"] },
+  };
+  const NEEDS_YOU = [
+    { agent: "Florence", emoji: "👩‍💻", text: "Retention dropped 14% — I drafted an alert for #data-alerts. Approve to send?", action: "Approve" },
+    { agent: "Ada", emoji: "🧑‍💻", text: "Found an 8.4% null rate in dim_customers emails. Open a ticket?", action: "Review" },
+  ];
+
+  const state = {
+    phase: "onboarding",
+    agentInfo: null,
+    ob: { screen: "landing", messages: [], input: "", typing: false, tasks: [], planStep: 0, msgCount: 0, planConfirmed: false, conn: {} },
+    wb: {
+      view: "home", openDoc: "kpi-weekly", openWiki: "overview", openAgent: null, activeProfile: "Florence",
+      kbExpanded: false, askOpen: true, askMessages: [], askInput: "", askTyping: false,
+      dbMessages: [], dbInput: "", dbTyping: false, doneNeeds: [],
+      profileSessions: { Florence: [], Ada: [] }, profileTab: "overview", showCreateProfile: false,
+      newProfile: { name: "", emoji: "🤖", role: "", soul: "" },
+    },
+  };
+
+  function sparkline(data, negative) {
+    const min = Math.min(...data), max = Math.max(...data);
+    const norm = data.map(v => 24 - ((v - min) / (max - min || 1)) * 20);
+    const points = norm.map((y, i) => `${i * 10},${y}`).join(" ");
+    return `<svg width="60" height="26" class="shrink-0"><polyline points="${points}" fill="none" stroke="${negative ? "#f87171" : "#a78bfa"}" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+  }
+  function progressBar(pct) {
+    return `<div class="h-1.5 w-40 rounded-full bg-zinc-100 overflow-hidden"><div class="h-full rounded-full bg-violet-500 transition-all" style="width:${pct}%"></div></div>`;
+  }
+  function typingDots() {
+    return `<div class="flex items-center gap-1 pl-8 pt-1">${[0,1,2].map(()=>`<div class="w-1.5 h-1.5 rounded-full bg-zinc-300 dot"></div>`).join("")}</div>`;
+  }
+
+  function mockFlorence(q) {
+    const s = q.toLowerCase();
+    if (s.includes("cohort")) return "Users who saw the new modal retained at 27% on Day-7 vs 41% for those who didn't — a 14pt gap.";
+    if (s.includes("confident")) return "Fairly confident — the drop aligns to the deploy date within a day.";
+    if (s.includes("next") || s.includes("recommend")) return "I'd revert the modal for a 50% holdout and watch Day-7 for 7 days.";
+    return "The active concern is the Day-7 retention drop tied to the Nov 28 modal — want the cohort comparison?";
+  }
+  function mockAda(q) {
+    const s = q.toLowerCase();
+    if (s.includes("issue")) return "Nothing blocking. Auto-fixed a freshness breach on fct_orders_daily this morning.";
+    if (s.includes("fix")) return "Re-triggered a stalled upstream job and re-ran 14 downstream models — all green.";
+    if (s.includes("fresh")) return "All 48 models fresh, 312 of 314 tests passing.";
+    return "Everything's green except a minor schema drift on dim_customers I flagged for review.";
+  }
+  function mockDb(q) {
+    const s = q.toLowerCase();
+    const w = state.wb;
+    if (w.view === "wiki") {
+      const pg = WIKI_PAGES.find(p => p.id === w.openWiki) || WIKI_PAGES[0];
+      if (pg.id === "overview") {
+        if (s.includes("agent") || s.includes("use")) return "Agents read this wiki before acting — semantic layer, conventions, and entity relationships. Proposed edits go through review before merging.";
+        if (s.includes("store") || s.includes("what")) return "Runbooks, metric definitions, ownership, gotchas, and stakeholder cadences — anything the fleet needs to stay aligned.";
+        if (s.includes("maintain") || s.includes("who")) return "Agents draft and refresh pages; your data team approves changes. Florence and Ada keep their sections current.";
+      }
+      if (pg.id === "semantic") {
+        if (s.includes("what") || s.includes("layer")) return "The semantic layer maps business metrics to warehouse tables — MRR, churn, activation, and 34 canonical definitions synced from dbt.";
+        if (s.includes("valid")) return "Agents cross-check queries against these definitions before computing or alerting. Drift between teams gets flagged automatically.";
+        if (s.includes("defin") || s.includes("metric")) return "Activation = 3+ core actions within 7 days. I can open Ada's Metric Definitions doc for the full list.";
+      }
+      if (pg.id === "entities") {
+        if (s.includes("entit") || s.includes("map")) return "Core entities: users, accounts, subscriptions, and events — linked via user_id and account_id across fct_* and dim_* models.";
+        if (s.includes("relationship")) return "Users belong to accounts; subscriptions roll up to MRR. Event streams tie back to both for retention cohorts.";
+        if (s.includes("table") || s.includes("link")) return "dim_users ↔ dim_accounts via account_id; fct_events joins on user_id. Florence uses these for cohort analysis.";
+      }
+      if (pg.id === "sources") {
+        if (s.includes("own") || s.includes("snowflake")) return "Snowflake is the primary warehouse — read-only access, owned by the data platform team. Revoke anytime from settings.";
+        if (s.includes("connect") || s.includes("source")) return "Snowflake (live), with spreadsheets archived. All agents read from the semantic layer, not raw tables.";
+        if (s.includes("fresh") || s.includes("sla")) return "Critical models refresh daily by 06:00 UTC. Ada monitors freshness and auto-fixes stalled upstream jobs.";
+      }
+      if (pg.id === "conventions") {
+        if (s.includes("gotcha") || s.includes("common")) return "Timezone is always UTC in the warehouse. Signup date ≠ activation date. Null emails in dim_customers are a known 8.4% issue.";
+        if (s.includes("nam")) return "fct_* for facts, dim_* for dimensions, stg_* for staging. Metrics use snake_case; dashboards use Title Case.";
+        if (s.includes("analyst") || s.includes("new")) return "Start with the glossary and metric definitions. Never query raw events without the activation filter.";
+      }
+      if (pg.id === "stakeholders") {
+        if (s.includes("report") || s.includes("receive")) return "Weekly KPI report goes to #data-alerts and the growth leadership group every Monday 08:00.";
+        if (s.includes("cadence") || s.includes("review")) return "KPI review is weekly; pipeline health is daily. Retention deep-dives are ad hoc when Florence flags a drop.";
+        if (s.includes("team") || s.includes("depend")) return "Growth, product, and finance depend on MRR and retention metrics. Engineering relies on Ada's pipeline runbooks.";
+      }
+      if (pg.id === "glossary") {
+        if (s.includes("activ")) return "Activation = 3+ core actions within 7 days of signup. It's the north-star input to Day-7 retention.";
+        if (s.includes("mrr") || s.includes("arr")) return "MRR = sum of active subscription amounts, normalized monthly. ARR = MRR × 12. We report MRR in weekly KPIs.";
+        if (s.includes("retention") || s.includes("day-7")) return "Day-7 retention = % of signups still active 7 days later. Currently 31.2%, down 14% since the Nov 28 modal change.";
+      }
+      if (pg.id === "runbooks") {
+        if (s.includes("fail") || s.includes("pipeline")) return "If a model fails freshness: Ada re-triggers upstream, re-runs downstream, and logs the incident. Escalate if not green in 30 min.";
+        if (s.includes("sla") || s.includes("on-call")) return "P1 pipeline breach: 30 min response. P2 schema drift: same business day. On-call rotates through the data platform team.";
+        if (s.includes("escalat")) return "L1: Ada auto-remediation → L2: data platform on-call → L3: eng lead if customer-facing metrics are stale past 09:00 UTC.";
+      }
+      return `I can help with "${pg.title}" — ask about what's documented here or how agents use it.`;
+    }
+    if (s.includes("attention")) return "Florence flagged a 14% drop in Day-7 retention tied to the Nov 28 onboarding modal.";
+    if (s.includes("summar")) return "This week: 58 tasks done, ~6h saved. Two goals active — KPIs need your call on retention.";
+    if (s.includes("retention")) return "Florence traced it to the Nov 28 modal. Want me to open her report?";
+    if (s.includes("marketing") || s.includes("goal")) return "I can spin up a new goal — tell me which metrics matter and where the data lives.";
+    return "I can route that to the right agent or pull a summary across your goals.";
+  }
+
+  const WIKI_SUGGESTIONS = {
+    overview: ["How do agents use this wiki?", "What should be stored here?", "Who maintains the knowledge base?"],
+    semantic: ["What's in the semantic layer?", "How do agents validate metrics?", "Show metric definitions"],
+    entities: ["What entities are mapped?", "How are relationships defined?", "Which tables link users to accounts?"],
+    sources: ["Who owns Snowflake data?", "Which sources are connected?", "What's the freshness SLA?"],
+    conventions: ["What are common gotchas?", "Any naming conventions?", "What should new analysts know?"],
+    stakeholders: ["Who receives weekly reports?", "What's the KPI review cadence?", "Which teams depend on this data?"],
+    glossary: ["Define activation", "What's MRR vs ARR?", "Explain Day-7 retention"],
+    runbooks: ["What if a pipeline fails?", "What's the on-call SLA?", "Show escalation paths"],
+  };
+
+  function dbQuickButtons(questions) {
+    return questions.map(q => `<button data-action="db-quick" data-text="${esc(q)}" class="w-full text-left text-sm px-3.5 py-2.5 rounded-xl border border-zinc-200 text-zinc-600 hover:border-zinc-200 cursor-pointer mb-2">${esc(q)}</button>`).join("");
+  }
+
+  function databaoEmptyState() {
+    const w = state.wb;
+    if (w.view === "wiki") {
+      const pg = WIKI_PAGES.find(p => p.id === w.openWiki) || WIKI_PAGES[0];
+      const suggestions = WIKI_SUGGESTIONS[pg.id] || WIKI_SUGGESTIONS.overview;
+      return `<div class="pt-0 text-center"><p class="text-sm font-bold mt-3">Ask about this page</p><p class="text-xs text-zinc-400 mt-2 mb-5">${esc(pg.title)} · I'll pull from the knowledge base.</p>${dbQuickButtons(suggestions)}</div>`;
+    }
+    return `<div class="pt-0 text-center"><p class="text-sm font-bold mt-3">Hi I'm Databao</p><p class="text-xs text-zinc-400 mt-2 mb-5">Ask for the big picture — I'll route it to the right agent.</p>${dbQuickButtons(["What needs my attention?","Summarize this week","Add a goal for marketing metrics"])}</div>`;
+  }
+
+  function planCard(plan, confirmed, msgIdx) {
+    const emoji = { Florence: "👩‍💻", Ada: "🧑‍💻" }[plan.agentName] || "👩‍💻";
+    return `<div class="border border-zinc-200 rounded-xl overflow-hidden max-w-md bg-white shadow-sm">
+      <div class="px-5 py-4 border-b border-zinc-200"><p class="text-xs text-zinc-400 mb-1">Here's the plan</p><div class="flex items-center gap-2"><span>🎯</span><p class="text-sm font-bold text-zinc-900">${esc(plan.goal)}</p></div></div>
+      <div class="px-5 py-4">
+        <div class="flex items-center gap-2 mb-3"><span class="text-lg">${emoji}</span><div><p class="text-sm font-semibold text-zinc-800">${esc(plan.agentName)}</p><p class="text-xs text-zinc-400">will own this goal</p></div></div>
+        ${plan.tasks.map(t=>`<div class="flex items-start gap-2.5 mb-2"><span class="text-violet-400 mt-0.5">${ICON.check}</span><div><p class="text-sm font-medium text-zinc-800">${esc(t.label)}</p><p class="text-xs text-zinc-400">${esc(t.detail)}</p></div></div>`).join("")}
+        <div class="flex items-center gap-2 text-xs text-zinc-500 bg-zinc-50 rounded-lg px-3 py-2 mb-4 mt-3"><span>❄️</span><span>Reading from ${esc(plan.source)} · read-only</span></div>
+        ${confirmed ? `<div class="flex items-center justify-center gap-2 h-10 rounded-lg bg-green-50 text-green-600 text-sm font-semibold">${ICON.check} Goal created</div>` :
+          `<div class="flex gap-2"><button data-action="confirm-plan" data-idx="${msgIdx}" class="flex-1 h-10 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold cursor-pointer">Confirm & create goal</button>
+          <button data-action="edit-plan" class="h-10 px-4 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 text-sm cursor-pointer">Edit</button></div>`}
+      </div></div>`;
+  }
+
+  function updateConnButton(key) {
+    const input = document.querySelector(`input[data-action="conn-input"][data-key="${CSS.escape(key)}"]`);
+    const btn = document.querySelector(`button[data-action="conn-connect"][data-key="${CSS.escape(key)}"]`);
+    if (!input || !btn) return;
+    const active = input.value.trim().length > 0;
+    btn.disabled = !active;
+    btn.className = "w-full h-9 rounded-lg text-sm font-semibold transition-colors " +
+      (active ? "bg-violet-500 hover:bg-violet-600 text-white cursor-pointer" : "bg-zinc-100 text-zinc-300 cursor-not-allowed");
+  }
+
+  function connectionForm(tool, key) {
+    const c = state.ob.conn[key] || { phase: "input", accountId: "" };
+    const active = c.accountId.trim().length > 0;
+    if (c.phase === "done") return `<div class="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-zinc-200 rounded-xl px-4 py-3 max-w-sm">${ICON.check}<span>${esc(tool)} authorized · read-only</span></div>`;
+    if (c.phase === "redirecting") return `<div class="border border-zinc-200 rounded-xl px-4 py-5 max-w-sm bg-white shadow-sm flex items-center gap-3"><div class="w-4 h-4 rounded-full border-2 border-zinc-200 border-t-violet-500 spinner"></div><div><p class="text-sm text-zinc-700">Redirecting to ${esc(tool)}…</p></div></div>`;
+    return `<div class="border border-zinc-200 rounded-xl overflow-hidden max-w-sm bg-white shadow-sm">
+      <div class="px-4 py-3.5 flex items-center gap-3 border-b border-zinc-200"><div class="w-9 h-9 rounded-lg bg-zinc-50 border flex items-center justify-center">❄️</div><div><p class="text-sm font-semibold text-zinc-900">Connect ${esc(tool)}</p><p class="text-xs text-zinc-400">Read-only · revoke anytime</p></div></div>
+      <div class="px-4 py-3.5 space-y-3"><input data-action="conn-input" data-key="${key}" value="${esc(c.accountId)}" placeholder="acme-xy12345" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none focus:border-zinc-200"/>
+      <button data-action="conn-connect" data-key="${key}" data-tool="${esc(tool)}" ${active ? "" : "disabled"} class="w-full h-9 rounded-lg text-sm font-semibold transition-colors ${active ? "bg-violet-500 hover:bg-violet-600 text-white cursor-pointer" : "bg-zinc-100 text-zinc-300 cursor-not-allowed"}">Continue with ${esc(tool)} →</button></div></div>`;
+  }
+
+  function obSkel(h, w) {
+    return `<div class="ob-skel rounded-lg ${h} ${w || "w-full"}"></div>`;
+  }
+
+  function onboardingSidebar() {
+    const nested = (n) => `<div class="ml-4 border-l border-zinc-200 pl-2 space-y-1.5 sidebar-nested">${Array.from({ length: n }, () => obSkel("h-5", "w-[85%]")).join("")}</div>`;
+    return `<div class="wb-sidebar">
+      <div class="px-3 pt-3 pb-2"><div class="px-2 py-1.5 flex items-center gap-2"><span class="w-5 h-5 rounded-md bg-zinc-200 flex items-center justify-center text-xs font-bold">A</span><p class="text-sm font-bold sidebar-label">Acme org</p></div></div>
+      <div class="px-3 pb-1"><div class="px-2 py-1.5 flex items-center gap-2 opacity-40 pointer-events-none"><span>🏠</span><span class="text-sm sidebar-label">Home</span></div></div>
+      <div class="px-3 pb-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2 sidebar-section-title">Goals</p>
+        <div class="px-2 mb-2 space-y-1.5">${obSkel("h-7")}${obSkel("h-7")}</div>
+        ${nested(3)}${nested(2)}
+      </div>
+      <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2 sidebar-section-title">Teammates</p>
+        <div class="px-2 space-y-1.5">${obSkel("h-8")}${obSkel("h-8")}</div>
+      </div>
+      <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2 sidebar-section-title">Knowledge base</p>
+        <div class="px-2 space-y-1.5">${obSkel("h-7")}${obSkel("h-7")}${obSkel("h-7")}${obSkel("h-7")}</div>
+      </div>
+    </div>`;
+  }
+
+  function obLayout(chat, main) {
+    return `<div class="flex h-screen bg-zinc-50 overflow-hidden font-sans min-h-0">${onboardingSidebar()}<div class="wb-split">${chat}${main}</div></div>`;
+  }
+
+  function obDatabaoChat(bodyHtml, inputHtml) {
+    return `<div class="wb-pane wb-chat-shell"><div class="wb-chat-card bg-white rounded-2xl border border-zinc-200 shadow-sm">
+      <div class="px-5 py-3.5 border-b border-zinc-200 flex items-center gap-2 shrink-0">${LOGO(20)}<button data-action="skip-onboarding" class="ml-auto text-xs text-zinc-400 hover:text-zinc-600 cursor-pointer">Skip</button></div>
+      <div id="ob-chat" class="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">${bodyHtml}</div>
+      ${inputHtml}
+    </div></div>`;
+  }
+
+  function artifactPanel() {
+    const items = ["Understand your tasks", "Set up data access", "Confirm the plan"];
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+      <h1 class="text-2xl font-bold text-zinc-900 mb-3">Set up progress</h1>
+      ${items.map((item,i)=>`<div class="flex items-center gap-2.5 mb-2"><span class="${i < state.ob.planStep ? "text-violet-500" : "text-zinc-200"}">${ICON.check}</span><p class="text-sm ${i < state.ob.planStep ? "text-zinc-300 line-through" : "text-zinc-700"}">${item}</p></div>`).join("")}
+    </div></div></div>`;
+  }
+
+  function landingChatContent() {
+    return `<div class="pt-1">
+      <p class="text-[15px] leading-relaxed text-zinc-800 font-semibold">Hi, I'm Databao. I'm here to help you with your golas. <br>What's on your plate?</p>
+      <p class="text-xs text-zinc-400 mt-2 mb-5">Tell it like you'd tell a colleague — type it, or just talk.</p>
+      <div class="flex gap-2 flex-wrap">
+        ${["📊 Watch my KPIs","📋 Take over reports","💬 Answer stakeholders"].map(s=>`<button data-action="start-chip" data-text="${esc(s.replace(/^[^\s]+\s/,""))}" class="inline-flex items-center justify-center h-8 px-3 text-xs rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 cursor-pointer leading-none">${s}</button>`).join("")}
+      </div>
+    </div>`;
+  }
+
+  function landingChatFooter() {
+    const v = state.ob.input.trim();
+    return `<div class="px-5 py-4 shrink-0"><div class="border border-zinc-200 rounded-xl px-3.5 py-2.5 flex items-center gap-3 bg-white">
+      ${ICON.mic}<input id="landing-input" value="${esc(state.ob.input)}" placeholder="Describe it in your own words…" class="flex-1 text-sm outline-none bg-transparent"/>
+      <button data-action="start-send" class="w-7 h-7 rounded-full flex items-center justify-center ${v ? "bg-violet-500 cursor-pointer" : "bg-zinc-100"}">${ICON.arrow}</button>
+    </div></div>`;
+  }
+
+  function renderLanding() {
+    return obLayout(obDatabaoChat(landingChatContent(), landingChatFooter()), artifactPanel());
+  }
+
+  function renderOnboarding() {
+    const msgs = state.ob.messages.map((msg, i) => {
+      const last = i === state.ob.messages.length - 1;
+      if (msg.role === "user") return `<div class="flex justify-end"><div class="bg-zinc-100 rounded-[16px_16px_4px_16px] px-3.5 py-2 text-sm text-zinc-800 max-w-sm">${esc(msg.content)}</div></div>`;
+      return `<div class="space-y-2.5">
+        ${msg.content ? `<p class="text-[15px] leading-relaxed text-zinc-800">${esc(msg.content)}</p>` : ""}
+        ${msg.planCard ? planCard(msg.planCard, state.ob.planConfirmed, i) : ""}
+        ${msg.uiWidget?.type === "connectionForm" ? connectionForm(msg.uiWidget.tool, "m"+i) : ""}
+        ${last && !state.ob.typing && msg.suggestions ? `<div class="flex gap-2 flex-wrap">${msg.suggestions.map(s=>`<button data-action="ob-send" data-text="${esc(s)}" class="text-sm px-3.5 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-zinc-200 cursor-pointer">${esc(s)}</button>`).join("")}</div>` : ""}
+      </div>`;
+    }).join("");
+    const chatBody = `${msgs}${state.ob.typing ? typingDots() : ""}`;
+    const chatInput = `<div class="px-5 py-4 shrink-0"><div class="border border-zinc-200 rounded-xl px-3.5 py-2.5 flex items-center gap-3 bg-white">
+      ${ICON.mic}<input id="ob-input" value="${esc(state.ob.input)}" placeholder="Reply…" ${state.ob.typing?"disabled":""} class="flex-1 text-sm outline-none bg-transparent disabled:opacity-50"/>
+      <button data-action="ob-send-btn" class="w-7 h-7 rounded-full flex items-center justify-center ${!state.ob.typing && state.ob.input.trim() ? "bg-violet-500 cursor-pointer" : "bg-zinc-100"}">${ICON.arrow}</button>
+    </div></div>`;
+    return obLayout(obDatabaoChat(chatBody, chatInput), artifactPanel());
+  }
+
+  function chatPanel(id, title, logo, messages, typing, input, placeholder, emptyHtml) {
+    const body = messages.length === 0 ? emptyHtml : messages.map(m =>
+      m.role === "user"
+        ? `<div class="flex justify-end"><div class="bg-zinc-100 rounded-[16px_16px_4px_16px] px-3.5 py-2 text-sm max-w-[300px]">${esc(m.content)}</div></div>`
+        : `<p class="text-[15px] leading-relaxed text-zinc-800">${esc(m.content)}</p>`
+    ).join("");
+    return `<div class="wb-pane wb-chat-shell"><div class="wb-chat-card bg-white rounded-2xl border border-zinc-200 shadow-sm">
+      <div class="px-5 py-3.5 border-b border-zinc-200 flex items-center gap-2 shrink-0">${logo}</div>
+      <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">${body}${typing ? `<div class="flex items-center gap-1 pl-7">${[0,1,2].map(()=>`<div class="w-1.5 h-1.5 rounded-full bg-zinc-300 dot"></div>`).join("")}</div>` : ""}</div>
+      <div class="px-5 py-4 shrink-0"><div class="border border-zinc-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5">
+        <input id="${id}-input" value="${esc(input)}" placeholder="${esc(placeholder)}" ${typing?"disabled":""} class="flex-1 text-sm outline-none bg-transparent"/>
+        <button data-action="${id}-send" class="w-7 h-7 rounded-full flex items-center justify-center ${!typing && input.trim() ? "bg-violet-500 cursor-pointer" : "bg-zinc-100"}">${ICON.arrow}</button>
+      </div></div>
+    </div></div>`;
+  }
+
+  function renderHome() {
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    const needs = NEEDS_YOU.map((item, i) => state.wb.doneNeeds.includes(i) ? "" :
+      `<div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 flex items-start gap-3"><span class="text-lg">${item.emoji}</span><div class="flex-1"><p class="text-sm text-zinc-700 mb-2.5"><span class="font-semibold">${item.agent}</span> · ${item.text}</p>
+      <div class="flex gap-2"><button data-action="dismiss-need" data-i="${i}" class="h-8 px-4 rounded-lg bg-violet-500 text-white text-xs font-semibold cursor-pointer">${item.action}</button>
+      <button data-action="dismiss-need" data-i="${i}" class="h-8 px-4 rounded-lg border border-zinc-200 text-zinc-500 text-xs cursor-pointer">Dismiss</button></div></div></div>`).join("");
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-4xl mx-auto">
+      <h1 class="text-2xl font-bold text-zinc-900 mb-1">${greeting}, Sam 👋</h1>
+      <p class="text-sm text-zinc-400 mb-8">Here's what your team handled while you were away.</p>
+      ${state.wb.doneNeeds.length < NEEDS_YOU.length ? `<div class="mb-8"><div class="flex items-center gap-2 mb-3"><h2 class="text-sm font-semibold">Waiting on you</h2></div><div class="space-y-2.5">${needs}</div></div>` : ""}
+      <h2 class="text-sm font-semibold mb-3">Your goals</h2>
+      <div class="grid grid-cols-2 gap-3 mb-8">
+        <button data-action="open-doc" data-doc="kpi-weekly" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🎯</span><p class="text-sm font-bold mt-3">Keep KPIs healthy</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Flagged Day-7 retention drop</p></button>
+        <button data-action="open-doc" data-doc="pipeline-health" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🛡️</span><p class="text-sm font-bold mt-3">Reliable pipelines</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Auto-fixed freshness breach</p></button>
+      </div>
+      <div class="flex items-center gap-2 mb-3"><h2 class="text-sm font-semibold">This week your team</h2></div>
+      <div class="grid grid-cols-2 gap-3">${[["5","co-workers at work"],["58","tasks done today"],["~1.9 FTE","capacity added"],["~6h","time saved"]].map(([n,l])=>`<div class="bg-white rounded-2xl border p-5"><p class="text-2xl font-bold">${n}</p><p class="text-xs text-zinc-400">${l}</p></div>`).join("")}</div>
+    </div></div></div>`;
+  }
+
+  function renderDoc() {
+    const d = DOC_CONTENT[state.wb.openDoc] || DOC_CONTENT["kpi-weekly"];
+    const emoji = AGENTS[d.agent]?.emoji || "👩‍💻";
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+      <div class="flex items-start justify-between mb-1"><h1 class="text-2xl font-bold text-zinc-900">${esc(d.title)}</h1><div class="flex items-center gap-1.5 text-xs text-zinc-400">${ICON.clock}<span>Updated ${esc(d.updated)} by ${esc(d.agent)}</span></div></div>
+      <p class="text-sm text-zinc-400 mb-8">${esc(d.subtitle)}</p>
+      <div class="bg-zinc-50/[0.01] border border-zinc-200 rounded-2xl p-5 mb-8"><div class="flex items-center gap-2 mb-4"><span>${emoji}</span><h2 class="text-xs font-semibold text-zinc-400 uppercase tracking-widest">While you were away, ${esc(d.agent)}:</h2></div>
+      ${d.feed.map(c=>`<div class="flex items-start gap-2.5 mb-2"><span class="text-violet-400 mt-0.5">${ICON.check.replace('w-4','w-3.5')}</span><p class="text-sm text-zinc-600 flex-1">${esc(c.action)}</p><p class="text-xs text-zinc-300">${esc(c.time)}</p></div>`).join("")}</div>
+      <h2 class="text-base font-bold mb-3">Summary</h2><p class="text-sm text-zinc-600 leading-relaxed mb-8">${esc(d.summary)}</p>
+      <div class="grid grid-cols-2 gap-3 mb-6">${d.metrics.map(k=>`<div class="rounded-xl border p-4 ${k.flagged?"border-zinc-200 bg-red-50/40":"border-zinc-200"}"><p class="text-xs text-zinc-400 mb-1">${esc(k.metric)}</p><div class="flex items-end justify-between"><div><p class="text-xl font-bold">${esc(k.value)}</p><p class="text-xs ${k.dir==="up"?"text-green-500":"text-red-400"}">${esc(k.change)}</p></div>${sparkline(k.spark, k.dir!=="up")}</div></div>`).join("")}</div>
+      <div class="bg-violet-50/70 border border-violet-200 rounded-xl px-4 py-3 mb-8">${ICON.sparkles}<p class="text-xs font-semibold text-violet-500 mt-1">${esc(d.agent)} noticed</p><p class="text-sm text-zinc-700 mt-1">${esc(d.annotation.text)}</p></div>
+      <h2 class="text-base font-bold mb-3">What ${esc(d.agent)} is watching</h2>${d.watching.map(w=>`<div class="flex items-start gap-2.5 mb-2"><span class="text-violet-400">${ICON.check}</span><p class="text-sm text-zinc-600">${esc(w)}</p></div>`).join("")}
+    </div></div></div>`;
+  }
+
+  function renderWiki() {
+    const pg = WIKI_PAGES.find(p => p.id === state.wb.openWiki) || WIKI_PAGES[0];
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+      <h1 class="text-2xl font-bold mb-6"><span>${pg.icon}</span> ${esc(pg.title)}</h1>
+      <p class="text-sm text-zinc-600 leading-relaxed">This wiki is the long-term memory for the Growth Analytics project — a living runbook maintained by agents and the data team.</p>
+      ${pg.id === "overview" ? `<p class="text-sm text-zinc-600 mt-4">Agents check the semantic layer, conventions, and entity relationships before taking action. Proposed changes are reviewed before merging.</p>` : `<div class="text-sm text-zinc-400 py-12 text-center border border-dashed border-zinc-200 rounded-2xl mt-6">${esc(pg.title)} · content maintained by the fleet</div>`}
+    </div></div></div>`;
+  }
+
+  function loadProfileChat(name) {
+    const w = state.wb;
+    if (w.openAgent && w.openAgent !== name) {
+      w.profileSessions[w.openAgent] = w.askMessages;
+    }
+    w.openAgent = name;
+    w.activeProfile = name;
+    w.askMessages = w.profileSessions[name] ? [...w.profileSessions[name]] : [];
+    w.askInput = "";
+    w.askTyping = false;
+  }
+
+  function profileCard(name, p, active) {
+    return `<div class="bg-white rounded-2xl border ${active ? "border-violet-300 ring-1 ring-violet-100" : "border-zinc-200"} shadow-sm p-5 flex flex-col">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">${p.emoji}</span>
+          <div>
+            <p class="text-sm font-bold text-zinc-900">${esc(name)}</p>
+            <p class="text-xs text-zinc-400">${esc(p.role)}</p>
+          </div>
+        </div>
+        ${active ? `<span class="text-[10px] font-semibold uppercase tracking-wide text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full">Active</span>` : ""}
+      </div>
+      <p class="text-xs text-zinc-500 leading-relaxed flex-1 mb-4 line-clamp-2">${esc(p.soul)}</p>
+      <div class="flex items-center gap-3 text-[11px] text-zinc-400 mb-4">
+        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${p.status === "online" ? "bg-green-500" : "bg-zinc-300"}"></span>${p.status === "online" ? "Online" : "Offline"}</span>
+        <span>·</span><span>:${p.gateway}</span>
+        <span>·</span><span>${p.sessions} sessions</span>
+      </div>
+      <div class="flex gap-2">
+        ${active
+          ? `<button data-action="open-agent" data-agent="${esc(name)}" class="flex-1 h-9 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-xs font-semibold cursor-pointer">Open</button>`
+          : `<button data-action="switch-profile" data-agent="${esc(name)}" class="flex-1 h-9 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold cursor-pointer">Switch to</button>`}
+        <button data-action="open-agent" data-agent="${esc(name)}" class="h-9 px-3 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 text-xs cursor-pointer">Configure</button>
+      </div>
+    </div>`;
+  }
+
+  function createProfileModal() {
+    const n = state.wb.newProfile;
+    const valid = n.name.trim().length > 0;
+    return `<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" data-action="close-create-profile">
+      <div class="bg-white rounded-2xl border border-zinc-200 shadow-lg w-full max-w-md p-6" data-action="modal-stop">
+        <h2 class="text-lg font-bold text-zinc-900 mb-1">New teammate profile</h2>
+        <p class="text-xs text-zinc-400 mb-5">Cloned from default · own persona, config, and session history</p>
+        <div class="space-y-3 mb-5">
+          <div class="flex gap-3">
+            <div class="w-20"><label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Emoji</label>
+            <input data-action="new-profile-field" data-field="emoji" value="${esc(n.emoji)}" class="w-full h-9 px-2 text-center text-lg border border-zinc-200 rounded-lg outline-none mt-1"/></div>
+            <div class="flex-1"><label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Name</label>
+            <input data-action="new-profile-field" data-field="name" value="${esc(n.name)}" placeholder="e.g. Morgan" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none mt-1"/></div>
+          </div>
+          <div><label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Role</label>
+          <input data-action="new-profile-field" data-field="role" value="${esc(n.role)}" placeholder="e.g. Marketing analytics" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none mt-1"/></div>
+          <div><label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Persona (SOUL)</label>
+          <textarea data-action="new-profile-field" data-field="soul" rows="3" placeholder="What this teammate owns and how they behave…" class="w-full px-3 py-2 text-sm border border-zinc-200 rounded-lg outline-none mt-1 resize-none">${esc(n.soul)}</textarea></div>
+        </div>
+        <div class="flex gap-2">
+          <button data-action="close-create-profile" class="flex-1 h-10 rounded-lg border border-zinc-200 text-zinc-600 text-sm cursor-pointer">Cancel</button>
+          <button data-action="create-profile" ${valid ? "" : "disabled"} class="flex-1 h-10 rounded-lg text-sm font-semibold ${valid ? "bg-violet-500 hover:bg-violet-600 text-white cursor-pointer" : "bg-zinc-100 text-zinc-300 cursor-not-allowed"}">Create profile</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderProfiles() {
+    const w = state.wb;
+    const names = Object.keys(PROFILES);
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-4xl mx-auto">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <h1 class="text-2xl font-bold text-zinc-900">Teammate profiles</h1>
+          <p class="text-sm text-zinc-400 mt-1">Isolated personas — each with its own config, sessions, and gateway port.</p>
+        </div>
+        <button data-action="open-create-profile" class="h-9 px-4 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold cursor-pointer shrink-0">+ New profile</button>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 mb-6">
+        <span class="font-mono text-zinc-500">active_profile</span>
+        <span>→</span>
+        <span class="font-semibold text-zinc-700">${esc(w.activeProfile)}</span>
+        <span class="text-zinc-300">·</span>
+        <span>gateway <span class="font-mono">127.0.0.1:${PROFILES[w.activeProfile]?.gateway || 8642}</span></span>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-8">
+        ${names.map(name => profileCard(name, PROFILES[name], name === w.activeProfile)).join("")}
+      </div>
+      <h2 class="text-sm font-semibold mb-3">How profiles work</h2>
+      <div class="grid grid-cols-3 gap-3">
+        ${[["🧠","Persona","Each profile has a SOUL — role, tone, and what they own."],["⚙️","Configuration","Provider, model, data sources, and integrations per profile."],["💬","Sessions","Chat history is isolated. Switch profiles without losing context."]].map(([icon,title,desc])=>`<div class="rounded-xl border border-zinc-200 p-4"><span class="text-lg">${icon}</span><p class="text-sm font-semibold mt-2">${title}</p><p class="text-xs text-zinc-400 mt-1 leading-relaxed">${desc}</p></div>`).join("")}
+      </div>
+    </div></div>${w.showCreateProfile ? createProfileModal() : ""}</div>`;
+  }
+
+  function profileConfigRow(label, value) {
+    return `<div class="flex items-center justify-between py-2.5 border-b border-zinc-100 last:border-0"><span class="text-xs text-zinc-400">${esc(label)}</span><span class="text-sm text-zinc-700 font-medium">${esc(value)}</span></div>`;
+  }
+
+  function skillLevelClass(level) {
+    if (level === "Expert") return "bg-violet-50 text-violet-700 border-violet-100";
+    if (level === "Advanced") return "bg-blue-50 text-blue-700 border-blue-100";
+    return "bg-zinc-50 text-zinc-600 border-zinc-200";
+  }
+
+  function renderPersonaTab(a) {
+    const p = a.persona || {};
+    const skills = p.skills || [];
+    const responsibilities = p.responsibilities || [];
+    const tools = p.tools || a.config?.integrations || [];
+    const tags = a.tags || [];
+
+    const skillsBlock = skills.length
+      ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${skills.map(s => `<div class="rounded-xl border border-zinc-200 bg-white p-4">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <p class="text-sm font-semibold text-zinc-900">${esc(s.name)}</p>
+            ${s.level ? `<span class="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full border ${skillLevelClass(s.level)}">${esc(s.level)}</span>` : ""}
+          </div>
+          <p class="text-xs text-zinc-500 leading-relaxed">${esc(s.desc)}</p>
+        </div>`).join("")}</div>`
+      : tags.length
+        ? `<div class="flex flex-wrap gap-2">${tags.map(t => `<span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-white text-violet-700 border border-violet-100">${esc(t)}</span>`).join("")}</div>`
+        : `<p class="text-xs text-zinc-400">No skills defined yet.</p>`;
+
+    return `<div class="space-y-4">
+      <div class="bg-[var(--tw-ring-offset-color)] border border-zinc-200 rounded-2xl p-5">
+        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2">SOUL.md</p>
+        <p class="text-sm text-zinc-700 leading-relaxed">${esc(a.soul)}</p>
+      </div>
+      <div class="rounded-2xl">
+        ${skillsBlock}
+      </div>
+      ${p.tone ? `<div class="bg-white border border-zinc-200 rounded-2xl p-5">
+        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2">Communication style</p>
+        <p class="text-sm text-zinc-700 leading-relaxed">${esc(p.tone)}</p>
+      </div>` : ""}
+      ${responsibilities.length ? `<div class="bg-white border border-zinc-200 rounded-2xl p-5">
+        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-3">Responsibilities</p>
+        <ul class="space-y-2">${responsibilities.map(r => `<li class="flex items-start gap-2 text-sm text-zinc-700"><span class="text-violet-400 mt-0.5">•</span><span>${esc(r)}</span></li>`).join("")}</ul>
+      </div>` : ""}
+      ${p.boundaries ? `<div class="bg-white border border-zinc-200 rounded-2xl p-5">
+        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2">Boundaries</p>
+        <p class="text-sm text-zinc-600 leading-relaxed">${esc(p.boundaries)}</p>
+      </div>` : ""}
+      ${tools.length ? `<div class="bg-white border border-zinc-200 rounded-2xl p-5">
+        <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-3">Tools & integrations</p>
+        <div class="flex flex-wrap gap-2">${tools.map(t => `<span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-lg bg-zinc-50 text-zinc-700 border border-zinc-200">${esc(t)}</span>`).join("")}</div>
+      </div>` : ""}
+    </div>`;
+  }
+
+  function parseMockTime(t) {
+    if (t === "just now") return 0;
+    const m = t.match(/^(\d+)\s*min ago$/);
+    if (m) return +m[1];
+    const h = t.match(/^(\d+)\s*hr ago$/);
+    if (h) return +h[1] * 60;
+    const d = t.match(/^(\d+)\s*days? ago$/);
+    if (d) return +d[1] * 1440;
+    return 9999;
+  }
+
+  function getAgentRecentActions(agentName) {
+    const profile = PROFILES[agentName];
+    if (!profile) return [];
+    const actions = [];
+    for (const docId of profile.docs) {
+      const doc = DOC_CONTENT[docId];
+      if (!doc?.feed) continue;
+      for (const item of doc.feed) actions.push(item);
+    }
+    return actions.sort((a, b) => parseMockTime(a.time) - parseMockTime(b.time));
+  }
+
+  function profileRecentActionsBlock(name) {
+    const actions = getAgentRecentActions(name).slice(0, 6);
+    return `<div class="flex items-center justify-between mb-3 pt-4">
+      <h2 class="text-sm font-semibold">Recent actions</h2>
+    </div>
+    <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 mb-6">
+      ${actions.length ? actions.map(c => `<div class="flex items-start gap-2.5 mb-2 last:mb-0"><span class="text-violet-400 mt-0.5 shrink-0">${ICON.check.replace('w-4','w-3.5')}</span><p class="text-sm text-zinc-600 flex-1">${esc(c.action)}</p><p class="text-xs text-zinc-300 shrink-0">${esc(c.time)}</p></div>`).join("") : `<p class="text-xs text-zinc-400">No recent actions yet.</p>`}
+    </div>`;
+  }
+
+  function renderAgent() {
+    const name = state.wb.openAgent;
+    const a = PROFILES[name];
+    if (!a) return "";
+    const w = state.wb;
+    const tab = w.profileTab || "overview";
+    const tabs = [["overview","Overview"],["persona","Persona"],["config","Configuration"]];
+    const tabBar = tabs.map(([id,label])=>`<button data-action="profile-tab" data-tab="${id}" class="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${tab===id?"bg-zinc-200/80 text-zinc-900":"text-zinc-500 hover:bg-zinc-100"}">${label}</button>`).join("");
+    let body = "";
+    if (tab === "overview") {
+      body = `<h2 class="text-sm font-semibold mb-3">Documents ${esc(name)} maintains</h2>
+      ${a.docs.map(id=>{const doc=DOCUMENTS.find(d=>d.id===id);return doc?`<button data-action="open-doc" data-doc="${id}" class="w-full text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer mb-2"><p class="text-sm font-bold">${esc(doc.title)}</p><p class="text-xs text-zinc-400 mt-1">Updated ${esc(doc.freshness)}</p></button>`:"";}).join("")}
+      ${profileRecentActionsBlock(name)}`;
+    } else if (tab === "persona") {
+      body = renderPersonaTab(a);
+    } else if (tab === "config") {
+      body = `<div class="bg-white border border-zinc-200 rounded-2xl px-5 py-1 mb-4">
+        ${profileConfigRow("Provider", a.config.provider)}
+        ${profileConfigRow("Model", a.config.model)}
+        ${profileConfigRow("Data sources", a.config.sources.join(", "))}
+        ${profileConfigRow("Integrations", a.config.integrations.join(", "))}
+        ${profileConfigRow("Gateway", "127.0.0.1:" + a.gateway)}
+        ${profileConfigRow("Profile path", "profiles/" + name.toLowerCase())}
+      </div>`;
+    } else {
+      const msgs = w.profileSessions[name] || w.askMessages || [];
+      body = msgs.length === 0
+        ? `<div class="text-center py-12 border border-dashed border-zinc-200 rounded-2xl"><p class="text-sm text-zinc-400">No sessions yet — start a conversation in the chat panel.</p></div>`
+        : `<div class="space-y-2">${msgs.slice(-5).map(m=>`<div class="rounded-xl border border-zinc-200 px-4 py-3 ${m.role==="user"?"bg-zinc-50":""}"><p class="text-[10px] font-semibold text-zinc-400 uppercase mb-1">${m.role==="user"?"You":name}</p><p class="text-sm text-zinc-700">${esc(m.content)}</p></div>`).join("")}</div>`;
+    }
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+      <div class="flex items-center gap-3 mb-1">
+        <span class="text-2xl">${a.emoji}</span>
+        <h1 class="text-2xl font-bold">${esc(name)}</h1>
+        <span class="text-xs text-green-600 bg-green-50 rounded-full px-2 py-0.5">${a.status === "online" ? "Online" : "Offline"}</span>
+        ${name !== w.activeProfile ? `<button data-action="switch-profile" data-agent="${esc(name)}" class="text-xs text-zinc-500 border border-zinc-200 rounded-full px-2 py-0.5 hover:bg-zinc-50 cursor-pointer">Set active</button>` : ""}
+      </div>
+      <p class="text-sm text-zinc-400 mb-4">${a.role} · ${a.docs.length} documents · ${a.sessions} sessions</p>
+      <div class="flex items-center gap-1.5 mb-6 flex-wrap">${tabBar}</div>
+      ${body}
+    </div></div></div>`;
+  }
+
+  function sidebar() {
+    const w = state.wb;
+    const docBtn = (doc) => `<button data-action="open-doc" data-doc="${doc.id}" class="w-full text-left px-2 py-1 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="doc"&&w.openDoc===doc.id?"bg-zinc-200/60 font-medium text-zinc-900":"text-zinc-500 hover:bg-zinc-100"}">${ICON.file}<span class="text-[13px] truncate sidebar-label">${esc(doc.title)}</span></button>`;
+    return `<div class="wb-sidebar">
+      <div class="px-3 pt-3 pb-2"><div class="px-2 py-1.5 flex items-center gap-2"><span class="w-5 h-5 rounded-md bg-zinc-200 flex items-center justify-center text-xs font-bold">A</span><p class="text-sm font-bold sidebar-label">Acme org</p></div></div>
+      <div class="px-3 pb-1"><button data-action="go-home" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="home"?"bg-zinc-200/60 font-medium":"text-zinc-600 hover:bg-zinc-100"}"><span>🏠</span><span class="text-sm sidebar-label">Home</span></button></div>
+      <div class="px-3 pb-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Goals</p>
+        <div class="px-2 py-1.5 text-sm font-medium flex gap-2"><span>🎯</span><span class="truncate sidebar-label">Keep KPIs healthy</span></div>
+        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["kpi-monitoring","kpi-weekly","retention"].includes(d.id)).map(docBtn).join("")}</div>
+        <div class="px-2 py-1.5 text-sm font-medium flex gap-2 mt-1"><span>🛡️</span><span class="truncate sidebar-label">Reliable pipelines</span></div>
+        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["pipeline-health","metric-defs"].includes(d.id)).map(docBtn).join("")}</div>
+      </div>
+      <div class="px-3 pb-2 mt-2"><div class="flex items-center justify-between px-2 mb-1"><p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest sidebar-section-title">Teammates</p></div>
+        ${Object.entries(PROFILES).map(([name,a])=>`<button data-action="open-agent" data-agent="${name}" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="agent"&&w.openAgent===name?"bg-zinc-200/60 font-medium":"text-zinc-700 hover:bg-zinc-100"}"><span>${a.emoji}</span><span class="text-sm sidebar-label flex-1 truncate">${name}</span></button>`).join("")}
+      </div>
+      <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Knowledge base</p>
+        ${(w.kbExpanded?WIKI_PAGES:WIKI_PAGES.slice(0,4)).map(pg=>`<button data-action="open-wiki" data-wiki="${pg.id}" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="wiki"&&w.openWiki===pg.id?"bg-zinc-200/60 font-medium":"text-zinc-600 hover:bg-zinc-100"}"><span>${pg.icon}</span><span class="text-[13px] truncate sidebar-label">${esc(pg.title)}</span></button>`).join("")}
+        <button data-action="toggle-kb" class="w-full text-left px-2 py-1.5 rounded-lg text-[13px] text-zinc-400 hover:bg-zinc-100 cursor-pointer sidebar-label">${w.kbExpanded?"Show less":(WIKI_PAGES.length-4)+" more"}</button>
+      </div>
+    </div>`;
+  }
+
+  function renderWorkbench() {
+    const w = state.wb;
+    const justOnboarded = !!state.agentInfo?.agentName;
+    if (justOnboarded && w.view === "home" && w.openDoc === "kpi-weekly") { w.view = "doc"; w.openDoc = "kpi-monitoring"; }
+
+    let main = "";
+    let chat = "";
+    if (w.view === "home") {
+      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState());
+      main = renderHome();
+    } else if (w.view === "wiki") {
+      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState());
+      main = renderWiki();
+    } else if (w.view === "profiles") {
+      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState());
+      main = renderProfiles();
+    } else if (w.view === "agent") {
+      chat = chatPanel("ask", w.openAgent, `<span class="text-lg">${AGENTS[w.openAgent]?.emoji||""}</span>`, w.askMessages, w.askTyping, w.askInput, `Message ${w.openAgent}…`,
+        `<p class="text-sm">Hi, I'm ${esc(w.openAgent)} 👋</p>`);
+      main = renderAgent();
+    } else if (w.view === "doc") {
+      const agent = DOC_CONTENT[w.openDoc]?.agent || "Florence";
+      chat = chatPanel("ask", agent, `<span class="text-lg">${AGENTS[agent]?.emoji||"👩‍💻"}</span>`, w.askMessages, w.askTyping, w.askInput, "Ask about this report…",
+        `<div class="text-center"><p class="text-sm pb-3">Hi, I'm ${esc(agent)} 👋</p>
+        ${["Show the cohort comparison","How confident are you it's the modal?","What would you do next?"].map(q=>`<button data-action="ask-quick" data-text="${esc(q)}" class="w-full text-left text-sm px-3.5 py-2.5 rounded-xl border mb-2 cursor-pointer">${q}</button>`).join("")}</div>`);
+      main = renderDoc();
+    }
+    const split = chat
+      ? `<div class="wb-split">${chat}${main}</div>`
+      : `<div class="wb-split">${main}</div>`;
+    return `<div class="flex h-screen bg-zinc-50 overflow-hidden font-sans min-h-0">${sidebar()}${split}</div>`;
+  }
+
+  function render() {
+    const app = document.getElementById("app");
+    if (state.phase === "onboarding") {
+      app.innerHTML = state.ob.screen === "landing" ? renderLanding() : renderOnboarding();
+    } else {
+      app.innerHTML = renderWorkbench();
+    }
+    bind();
+    const chat = document.getElementById("ob-chat");
+    if (chat) chat.scrollTop = chat.scrollHeight;
+  }
+
+  function skipOnboarding() {
+    state.phase = "product";
+    state.wb.view = "home";
+    render();
+  }
+
+  function startOnboarding(text) {
+    state.ob.screen = "onboarding";
+    state.ob.messages = [{ role: "ai", content: "Hi, I'm Databao 👋 What's on your plate?", suggestions: null }];
+    state.ob.msgCount = 0; state.ob.tasks = []; state.ob.planStep = 0; state.ob.planConfirmed = false; state.ob.conn = {};
+    if (text) { state.ob.messages.push({ role: "user", content: text }); state.ob.msgCount = 1; respondScripted(text, 0); }
+    render();
+  }
+
+  function respondScripted(userText, stepIndex) {
+    state.ob.typing = true; render();
+    setTimeout(() => {
+      state.ob.typing = false;
+      const step = SCRIPT[Math.min(stepIndex, SCRIPT.length - 1)];
+      if (step.artifact?.tasks) state.ob.tasks = step.artifact.tasks;
+      if (step.artifact?.planStep !== undefined) state.ob.planStep = Math.max(state.ob.planStep, step.artifact.planStep);
+      state.ob.messages.push({ role: "ai", content: step.reply, suggestions: step.suggestions || null, uiWidget: step.ui ? step.ui(userText) : null, planCard: step.planCard || null });
+      render();
+    }, 850 + Math.random() * 400);
+  }
+
+  function obSend(text) {
+    if (!text.trim() || state.ob.typing) return;
+    state.ob.input = "";
+    state.ob.messages.push({ role: "user", content: text.trim() });
+    const step = state.ob.msgCount;
+    state.ob.msgCount++;
+    respondScripted(text.trim(), step);
+  }
+
+  function confirmPlan(plan) {
+    state.ob.planConfirmed = true;
+    state.ob.planStep = 3;
+    render();
+    setTimeout(() => {
+      state.agentInfo = { agentName: plan.agentName, summary: `The "${plan.goal}" goal is live.` };
+      state.phase = "product";
+      state.wb.view = "doc";
+      state.wb.openDoc = "kpi-monitoring";
+      render();
+    }, 650);
+  }
+
+  function sendChat(kind, text) {
+    if (!text.trim()) return;
+    const w = state.wb;
+    if (kind === "db") {
+      if (w.dbTyping) return;
+      w.dbInput = "";
+      w.dbMessages.push({ role: "user", content: text.trim() });
+      w.dbTyping = true; render();
+      setTimeout(() => { w.dbTyping = false; w.dbMessages.push({ role: "agent", content: mockDb(text) }); render(); }, 900);
+    } else {
+      if (w.askTyping) return;
+      w.askInput = "";
+      w.askMessages.push({ role: "user", content: text.trim() });
+      if (w.openAgent) w.profileSessions[w.openAgent] = w.askMessages;
+      w.askTyping = true; render();
+      const agent = w.view === "agent" ? w.openAgent : (DOC_CONTENT[w.openDoc]?.agent || "Florence");
+      setTimeout(() => {
+        w.askTyping = false;
+        w.askMessages.push({ role: "agent", content: agent === "Ada" ? mockAda(text) : mockFlorence(text) });
+        if (w.openAgent) {
+          w.profileSessions[w.openAgent] = w.askMessages;
+          if (PROFILES[w.openAgent]) PROFILES[w.openAgent].sessions = w.askMessages.length;
+        }
+        render();
+      }, 900);
+    }
+  }
+
+  function bind() {
+    const app = document.getElementById("app");
+    app.onclick = e => {
+      const el = e.target.closest("[data-action]");
+      if (!el) return;
+      if (el.dataset.action === "modal-stop") return;
+      const a = el.dataset.action, t = el.dataset.text, i = el.dataset.i;
+      if (a === "skip-onboarding") skipOnboarding();
+      if (a === "start-chip" || a === "start-send" || a === "start-continue") startOnboarding(state.ob.input.trim() || t);
+      if (a === "ob-send") obSend(t);
+      if (a === "ob-send-btn") obSend(state.ob.input);
+      if (a === "confirm-plan") confirmPlan(state.ob.messages[+el.dataset.idx].planCard);
+      if (a === "edit-plan") obSend("I'd like to change something");
+      if (a === "conn-connect") {
+        const key = el.dataset.key, tool = el.dataset.tool;
+        const c = state.ob.conn[key] || { accountId: "" };
+        if (!c.accountId.trim()) return;
+        c.phase = "redirecting"; state.ob.conn[key] = c; render();
+        setTimeout(() => { c.phase = "done"; state.ob.conn[key] = c; render(); setTimeout(() => obSend(tool + " connected"), 400); }, 1400);
+      }
+      if (a === "go-home") { state.wb.view = "home"; state.wb.askMessages = []; render(); }
+      if (a === "open-doc") { state.wb.view = "doc"; state.wb.openDoc = el.dataset.doc; state.wb.askMessages = []; render(); }
+      if (a === "open-agent") { loadProfileChat(el.dataset.agent); state.wb.view = "agent"; state.wb.profileTab = "overview"; render(); }
+      if (a === "open-profiles") { state.wb.view = "profiles"; render(); }
+      if (a === "switch-profile") { loadProfileChat(el.dataset.agent); render(); }
+      if (a === "profile-tab") { state.wb.profileTab = el.dataset.tab; render(); }
+      if (a === "open-create-profile") { state.wb.showCreateProfile = true; render(); }
+      if (a === "close-create-profile") { state.wb.showCreateProfile = false; render(); }
+      if (a === "create-profile") {
+        const n = state.wb.newProfile, name = n.name.trim();
+        if (!name || PROFILES[name]) return;
+        const port = 8642 + Object.keys(PROFILES).length;
+        PROFILES[name] = {
+          emoji: n.emoji || "🤖", role: n.role || "Custom teammate", docs: [], tasks: 0,
+          soul: n.soul || "A new teammate cloned from the default profile.",
+          tags: n.role ? [n.role] : [],
+          persona: {
+            tone: "Professional and helpful — adapts to your team's communication style.",
+            skills: n.role ? [{ name: n.role, level: "Developing", desc: "Primary focus area for this teammate." }] : [],
+            responsibilities: [],
+            boundaries: "Escalates tasks outside defined scope to the appropriate teammate.",
+            tools: ["Snowflake"],
+          },
+          status: "online", gateway: port, sessions: 0, isDefault: false,
+          config: { provider: "Anthropic", model: "claude-sonnet-4", sources: ["Snowflake"], integrations: [] },
+        };
+        state.wb.profileSessions[name] = [];
+        state.wb.activeProfile = name;
+        state.wb.showCreateProfile = false;
+        state.wb.newProfile = { name: "", emoji: "🤖", role: "", soul: "" };
+        loadProfileChat(name);
+        state.wb.view = "agent";
+        render();
+      }
+      if (a === "open-wiki") { state.wb.view = "wiki"; state.wb.openWiki = el.dataset.wiki; render(); }
+      if (a === "toggle-kb") { state.wb.kbExpanded = !state.wb.kbExpanded; render(); }
+      if (a === "dismiss-need") { state.wb.doneNeeds.push(+i); render(); }
+      if (a === "db-send") sendChat("db", state.wb.dbInput);
+      if (a === "db-quick") sendChat("db", t);
+      if (a === "ask-send") sendChat("ask", state.wb.askInput);
+      if (a === "ask-quick") sendChat("ask", t);
+    };
+    app.oninput = e => {
+      if (e.target.id === "landing-input") state.ob.input = e.target.value;
+      if (e.target.id === "ob-input") state.ob.input = e.target.value;
+      if (e.target.id === "db-input") state.wb.dbInput = e.target.value;
+      if (e.target.id === "ask-input") state.wb.askInput = e.target.value;
+      if (e.target.dataset.action === "conn-input") {
+        const key = e.target.dataset.key;
+        state.ob.conn[key] = { ...(state.ob.conn[key]||{}), accountId: e.target.value, phase: "input" };
+        updateConnButton(key);
+      }
+      if (e.target.dataset.action === "new-profile-field") {
+        state.wb.newProfile[e.target.dataset.field] = e.target.value;
+        render();
+      }
+    };
+    app.onkeydown = e => {
+      if (e.key !== "Enter" || e.shiftKey) return;
+      if (e.target.id === "landing-input" && state.ob.input.trim()) { e.preventDefault(); startOnboarding(state.ob.input.trim()); }
+      if (e.target.id === "ob-input") { e.preventDefault(); obSend(state.ob.input); }
+      if (e.target.id === "db-input") { e.preventDefault(); sendChat("db", state.wb.dbInput); }
+      if (e.target.id === "ask-input") { e.preventDefault(); sendChat("ask", state.wb.askInput); }
+      if (e.target.dataset.action === "conn-input") { e.preventDefault(); e.target.closest("[data-action=conn-connect]")?.click(); }
+    };
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", render);
+  } else {
+    render();
+  }
+})();
+  </script>
+</body>
+</html>
