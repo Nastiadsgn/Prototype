@@ -20,7 +20,7 @@ From the project folder:
 ./serve.sh
 ```
 
-Then open **http://localhost:8080** in your browser.
+Then open **http://localhost:5173** in your browser.
 
 If `./serve.sh` isn't executable:
 
@@ -32,7 +32,7 @@ chmod +x serve.sh
 Or run Python directly:
 
 ```bash
-python3 -m http.server 8080
+python3 -m http.server 5173
 ```
 
 **Option 2 — open the file**
@@ -53,8 +53,8 @@ Point your web server at that file (nginx, Apache, S3 static hosting, etc.).
 
 | Problem | Fix |
 |---------|-----|
-| Blank page at `localhost:5173` | Wrong port — use **http://localhost:8080** after running `./serve.sh` |
-| `localhost` with no port | Nothing listens on port 80 by default — use **http://localhost:8080** |
+| Blank page at `localhost:8080` | Wrong port — use **http://localhost:5173** after running `./serve.sh` |
+| `localhost` with no port | Nothing listens on port 80 by default — use **http://localhost:5173** |
 | "Can't connect" / nothing loads | Start the server first: `./serve.sh` |
 | Stuck on "Loading Databao…" | Hard refresh (Cmd+Shift+R) or check the browser console for errors |
 | `./serve.sh: Permission denied` | Run `chmod +x serve.sh`, then try again |

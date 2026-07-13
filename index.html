@@ -47,6 +47,7 @@
     .rounded-xl { border-radius: .75rem; }
     .rounded-2xl { border-radius: 1rem; }
     .rounded-md { border-radius: .375rem; }
+    .rounded-\[20px\] { border-radius: 20px; }
     .rounded-full { border-radius: 9999px; }
     .border { border: 1px solid #e4e4e7; }
     .border-zinc-200 { border-color: #e4e4e7; }
@@ -75,20 +76,77 @@
     .dot:nth-child(3) { animation-delay: .36s; }
     .spinner { animation: spin .8s linear infinite; }
 
-    /* Workbench: chat + content 50/50, responsive */
+    /* Workbench: context-primary (asset + chat appendix) vs conversation-primary (chat only) */
     .wb-split {
       flex: 1;
       min-width: 0;
       min-height: 0;
       display: flex;
-      flex-direction: column;
       overflow: hidden;
     }
+    .wb-split--context {
+      flex-direction: column;
+    }
     @media (min-width: 768px) {
-      .wb-split { flex-direction: row; }
+      .wb-split--context { flex-direction: row; }
+    }
+    .wb-split--context > .wb-pane:not(.wb-chat-shell) {
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0.75rem 0.75rem 0.25rem;
+    }
+    .wb-split--context .wb-chat-shell {
+      flex: 0 0 auto;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+      max-height: 42vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+      border-top: 1px solid #e4e4e7;
+    }
+    @media (min-width: 768px) {
+      .wb-split--context .wb-chat-shell {
+        width: 22rem;
+        max-width: 30vw;
+        max-height: none;
+        border-top: none;
+        border-left: 1px solid #e4e4e7;
+        padding: 0;
+      }
+      .wb-split--context.wb-split--chat-left .wb-chat-shell {
+        border-left: 1px solid #e4e4e7;
+        border-right: none;
+        padding: 0;
+      }
+      .wb-split--context > .wb-pane:not(.wb-chat-shell) {
+        padding: 1rem 0.75rem 1rem 1rem;
+      }
+      .wb-split--context.wb-split--chat-left > .wb-pane:not(.wb-chat-shell) {
+        padding: 1rem 1rem 1rem 0.75rem;
+      }
+    }
+    .wb-split--conversation {
+      flex-direction: column;
+      align-items: center;
+    }
+    .wb-split--conversation .wb-chat-shell {
+      flex: 1;
+      width: 100%;
+      max-width: 40rem;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 1rem 1.25rem;
     }
     .wb-pane {
-      flex: 1 1 50%;
       min-width: 0;
       min-height: 0;
       display: flex;
@@ -96,10 +154,27 @@
       overflow: hidden;
     }
     .wb-chat-shell {
-      padding: 1rem 0.75rem 1rem 0.5rem;
       height: 100%;
       min-height: 0;
     }
+    .wb-chat-reopen {
+      flex: 0 0 2.25rem;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-left: 1px solid #e4e4e7;
+      background: #fff;
+      color: #71717a;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+      cursor: pointer;
+    }
+    .wb-chat-reopen:hover { background: #f4f4f5; color: #3f3f46; }
     .wb-chat-card {
       flex: 1;
       min-height: 0;
@@ -107,11 +182,50 @@
       flex-direction: column;
       overflow: hidden;
     }
+    .wb-split--context .wb-chat-card--flat {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .wb-split--conversation .wb-chat-card--flat {
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 1rem;
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+    }
     .wb-pane-content {
       height: 100%;
       min-height: 0;
       overflow-y: auto;
       padding: 20px;
+    }
+    .wb-split--context > .wb-pane:not(.wb-chat-shell) .wb-pane-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 1rem;
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+      padding: 1rem;
+    }
+    .wb-setup-progress { flex-shrink: 0; }
+    .wb-artifact-area {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .wb-artifact-placeholder {
+      min-height: 12rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #e4e4e7;
+      border-radius: 0.75rem;
+      background: #fafafa;
     }
     .wb-sidebar {
       width: 15rem;
@@ -158,10 +272,20 @@
     }
     .min-w-0 { min-width: 0; }
     .h-full { height: 100%; }
-    @keyframes ob-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
-    .ob-skel { background: #f4f4f5; animation: ob-pulse 2s ease-in-out infinite; }
     .space-y-1\.5 > * + * { margin-top: .375rem; }
     .space-y-2 > * + * { margin-top: .5rem; }
+    [data-action="add-context"] {
+      cursor: pointer;
+      transition: background 0.12s, box-shadow 0.12s;
+    }
+    [data-action="add-context"]:hover {
+      background: rgba(139, 92, 246, 0.05);
+      box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.18);
+    }
+    [data-action="add-context"].wb-context-active {
+      background: rgba(139, 92, 246, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.35);
+    }
   </style>
 </head>
 <body class="bg-zinc-50">
@@ -185,13 +309,439 @@
     edit: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
   };
 
-  const SCRIPT = [
-    { reply: "Good place to start — and there's usually more behind it. How long does pulling that together take you right now?", suggestions: ["10–15 minutes", "A couple hours", "Half a day"], artifact: { planStep: 1, tasks: [{ label: "KPI Monitoring", detail: "recurring · time TBD" }] } },
-    { reply: "That adds up fast. Where does the data live — a warehouse like Snowflake, or spreadsheets?", suggestions: ["Snowflake", "BigQuery", "Spreadsheets"], artifact: { planStep: 1, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · ~1+ hr · weekly" }] } },
-    { reply: "Let me pull up the connection form.", ui: (t) => ({ type: "connectionForm", tool: t || "Snowflake" }), artifact: { planStep: 1, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · ~1+ hr · weekly" }] } },
-    { reply: "Here's what I'll set up. Take a look — you can tweak it or confirm.", planCard: { goal: "Keep KPIs healthy", agentName: "Florence", source: "Snowflake", tasks: [{ label: "Weekly KPI monitoring", detail: "Revenue & churn · every Monday" }, { label: "Early warnings", detail: "Alert when a metric moves sharply" }] }, artifact: { planStep: 2, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · from Snowflake · weekly" }] } },
-    { reply: "Sure — what would you like to change? You can adjust the tasks, the schedule, or the data source.", suggestions: ["Actually, it's good — confirm", "Change the schedule"], artifact: { planStep: 2, tasks: [{ label: "KPI Monitoring", detail: "Revenue & churn · from Snowflake · weekly" }] } },
+  const USER_ROLES = [
+    "Market expert",
+    "Product manager",
+    "Revenue Ops",
+    "Analyst",
   ];
+  const ONBOARDING_CAPS = ["Analyse a dataset", "Monitor a KPI", "Run reports on schedule", "Forecast something", "Something else"];
+  const ONBOARDING_GREETING = "Hi, I'm Databao. I can take data tasks off your plate. How can I help you today?";
+
+  const ACHIEVEMENT_SUGGESTIONS = {
+    "Analyse a dataset": ["Find trends and outliers", "Compare segments", "Summarize key metrics", "Something else"],
+    "Monitor a KPI": ["Keep KPIs healthy", "Track revenue & churn", "Alert me when metrics drop", "Something else"],
+    "Run reports on schedule": ["Weekly stakeholder report", "Daily ops snapshot", "Monthly board summary", "Something else"],
+    "Forecast something": ["Project next quarter revenue", "Estimate churn risk", "Model growth scenarios", "Something else"],
+    "Something else": ["Save time on recurring work", "Make data-driven decisions", "Keep the team aligned", "Describe it myself"],
+  };
+
+  function achievementSuggestions(capability) {
+    return ACHIEVEMENT_SUGGESTIONS[capability] || ["Keep KPIs healthy", "Save time on recurring work", "Make data-driven decisions", "Something else"];
+  }
+
+  const SCHEDULE_OPTIONS = [
+    "Specific time every day, week, or month",
+    "Regularly in minutes, hours, or days intervals",
+    "Based on a specific condition (new email, calendar, etc.)",
+    "Something else",
+  ];
+
+  const DATA_CONNECTIONS = [
+    { name: "Snowflake", emoji: "❄️", desc: "Data warehouse" },
+    { name: "BigQuery", emoji: "📊", desc: "Google Cloud warehouse" },
+    { name: "Google Sheets", emoji: "📋", desc: "Spreadsheets" },
+    { name: "PostgreSQL", emoji: "🐘", desc: "Database" },
+    { name: "dbt Cloud", emoji: "🔧", desc: "Transformations" },
+    { name: "S3", emoji: "🪣", desc: "Object storage" },
+    { name: "Google Analytics", emoji: "📈", desc: "Web & campaign analytics" },
+    { name: "HubSpot", emoji: "🧲", desc: "Marketing CRM" },
+    { name: "Meta Ads", emoji: "📣", desc: "Paid social data" },
+    { name: "Mixpanel", emoji: "📱", desc: "Product analytics" },
+    { name: "Amplitude", emoji: "📊", desc: "Behavioral analytics" },
+    { name: "Salesforce", emoji: "☁️", desc: "CRM & pipeline" },
+  ];
+
+  const ROLE_CONNECTIONS = {
+    "Market expert": ["Google Analytics", "Google Sheets", "HubSpot", "Meta Ads"],
+    "Product manager": ["Mixpanel", "Amplitude", "PostgreSQL", "Google Sheets"],
+    "Revenue Ops": ["Salesforce", "Snowflake", "BigQuery", "Google Sheets"],
+    "Analyst": ["Snowflake", "BigQuery", "PostgreSQL", "dbt Cloud", "S3"],
+  };
+
+  function connectionsForRole(role) {
+    const names = ROLE_CONNECTIONS[role];
+    if (!names) return DATA_CONNECTIONS;
+    return names.map((n) => DATA_CONNECTIONS.find((c) => c.name === n)).filter(Boolean);
+  }
+
+  const SCRIPT = [
+    { reply: "What would you like to achieve with that?", suggestions: null, artifact: { planStep: 2 } },
+    { reply: "Would you like to automate this task to run regularly?", suggestions: ["Yes", "No"], artifact: { planStep: 2 } },
+    { reply: "Should we run this task…", suggestions: SCHEDULE_OPTIONS, artifact: { planStep: 2 } },
+    { reply: "Where does your data live? Pick a connection below.", ui: () => ({ type: "connectionPicker" }), artifact: { planStep: 3 } },
+    { reply: "Here's what I'll set up. Take a look — tweak anything, or execute the first task when you're ready.", artifact: { planStep: 3 } },
+    { reply: "Sure — what would you like to change? You can adjust the tasks, the schedule, or the data source.", suggestions: ["Looks good — execute first task", "Change the schedule"], artifact: { planStep: 3 } },
+  ];
+
+  function planGoalLabel() {
+    const ach = state.ob.achievement;
+    const cap = state.ob.capability;
+    if (ach && !/^(something else|describe it myself)$/i.test(ach.trim())) return ach.trim();
+    return cap || "New goal";
+  }
+
+  function planSecondaryTask(capability) {
+    const map = {
+      "Analyse a dataset": { label: "Quality checks", detail: "Validate freshness and flag anomalies" },
+      "Monitor a KPI": { label: "Early warnings", detail: "Alert when a metric moves sharply" },
+      "Run reports on schedule": { label: "Draft & deliver", detail: "Format and send when ready" },
+      "Forecast something": { label: "Scenario notes", detail: "Document assumptions and confidence" },
+      "Something else": { label: "Follow-up", detail: "Review output and refine next steps" },
+    };
+    return map[capability] || map["Something else"];
+  }
+
+  function pickAgent(capability, role, achievement) {
+    const text = `${capability} ${achievement || ""} ${state.ob.dataSource || ""}`;
+    if (/pipeline|dbt|freshness|schema|transform|reliable|postgres|s3/i.test(text)) return "Ada";
+    if (role === "Analyst" && /dbt|postgres|s3|bigquery|snowflake/i.test(state.ob.dataSource || "")) return "Ada";
+    return "Florence";
+  }
+
+  function planPrimaryDetail(source) {
+    const parts = [`from ${source}`];
+    if (state.ob.wantAutomate && state.ob.schedule) parts.push(scheduleDetail(state.ob.schedule));
+    else if (state.ob.wantAutomate) parts.push("automated · recurring");
+    else parts.push("on demand");
+    return parts.join(" · ");
+  }
+
+  function buildPlan() {
+    const source = state.ob.dataSource || "your data source";
+    const goal = planGoalLabel();
+    const secondary = planSecondaryTask(state.ob.capability);
+    return {
+      goal,
+      agentName: pickAgent(state.ob.capability, state.ob.userRole, state.ob.achievement),
+      source,
+      tasks: [
+        { label: goal, detail: planPrimaryDetail(source) },
+        { label: secondary.label, detail: secondary.detail },
+      ],
+    };
+  }
+
+  function userGoalMeta() {
+    if (!state.agentInfo?.goal) return null;
+    const doc = DOC_CONTENT["kpi-monitoring"];
+    return {
+      goal: state.agentInfo.goal,
+      title: doc?.title || state.agentInfo.goal,
+      agent: state.agentInfo.agentName,
+      blurb: doc?.annotation?.text || state.agentInfo.summary,
+      capability: state.agentInfo.capability,
+    };
+  }
+
+  function buildUserGoalDoc(plan) {
+    const cap = state.ob.capability || "Something else";
+    const source = plan.source || state.ob.dataSource || "your data source";
+    const role = state.ob.userRole || "your role";
+    const goal = plan.goal;
+    const agent = plan.agentName;
+    const secondary = planSecondaryTask(cap);
+    const automated = state.ob.wantAutomate;
+    const scheduleText = state.ob.schedule ? scheduleDetail(state.ob.schedule) : (automated ? "automated · recurring" : "on demand");
+    const cadence = automated ? scheduleText : "on demand";
+
+    const profiles = {
+      "Monitor a KPI": {
+        title: goal,
+        summary: `Your KPI goal is live. I'll watch metrics from ${source} and ${automated ? "run on your schedule (" + scheduleText + ")" : "refresh whenever you ask"}.`,
+        feed: [
+          { action: `connected to ${source} and mapped your core KPI tables`, time: "just now" },
+          { action: automated ? `scheduled monitoring · ${scheduleText}` : "set up on-demand KPI checks", time: "just now" },
+          { action: `configured ${secondary.label.toLowerCase()} — ${secondary.detail.toLowerCase()}`, time: "just now" },
+        ],
+        metrics: [
+          { metric: "Primary KPI", value: "—", change: "tracking", dir: "up", spark: [40, 42, 41, 44, 45, 44, 47] },
+          { metric: "Alert threshold", value: "Set", change: "active", dir: "up", spark: [46, 47, 48, 48, 47, 48, 48] },
+        ],
+        annotation: { topic: "what happens next", text: automated ? `I'm live. Your first scheduled check follows your ${scheduleText} cadence.` : `I'm live. Ask anytime for a fresh read on ${goal.toLowerCase()}.` },
+        watching: [`${goal} — ${cadence}`, `${secondary.label} — ${secondary.detail}`, `Data from ${source}`],
+      },
+      "Analyse a dataset": {
+        title: goal,
+        summary: `Your analysis goal is set up. I'll explore ${source}, surface trends and outliers, and ${automated ? "refresh on " + scheduleText : "run on demand"}.`,
+        feed: [
+          { action: `connected to ${source} and profiled the dataset schema`, time: "just now" },
+          { action: "ran initial quality checks — freshness and null rates", time: "just now" },
+          { action: `queued ${secondary.label.toLowerCase()} — ${secondary.detail.toLowerCase()}`, time: "just now" },
+        ],
+        metrics: [
+          { metric: "Rows scanned", value: "—", change: "profiling", dir: "up", spark: [55, 58, 60, 62, 64, 63, 65] },
+          { metric: "Anomalies flagged", value: "0", change: "baseline", dir: "up", spark: [48, 47, 49, 48, 47, 48, 48] },
+        ],
+        annotation: { topic: "first pass", text: `Tell me what to compare or slice — I'll start from ${source} and report back on ${goal.toLowerCase()}.` },
+        watching: [`Dataset freshness in ${source}`, `${secondary.label} — ${secondary.detail}`, `Scope: ${goal}`],
+      },
+      "Run reports on schedule": {
+        title: goal,
+        summary: `Your reporting goal is configured. I'll pull from ${source}, draft ${goal.toLowerCase()}, and ${automated ? "deliver on " + scheduleText : "generate on request"}.`,
+        feed: [
+          { action: `connected to ${source} and mapped report fields`, time: "just now" },
+          { action: automated ? `scheduled delivery · ${scheduleText}` : "saved report template for on-demand runs", time: "just now" },
+          { action: `set up ${secondary.label.toLowerCase()} — ${secondary.detail.toLowerCase()}`, time: "just now" },
+        ],
+        metrics: [
+          { metric: "Next report", value: automated ? "Scheduled" : "On request", change: cadence, dir: "up", spark: [40, 41, 42, 43, 44, 45, 46] },
+          { metric: "Data source", value: source, change: "connected", dir: "up", spark: [46, 47, 48, 48, 47, 48, 48] },
+        ],
+        annotation: { topic: "delivery", text: automated ? `First report drafts on your ${scheduleText} schedule.` : `Say the word and I'll generate ${goal.toLowerCase()} from ${source}.` },
+        watching: [`${goal} — ${cadence}`, `${secondary.label} — ${secondary.detail}`, `Stakeholder-ready output from ${source}`],
+      },
+      "Forecast something": {
+        title: goal,
+        summary: `Your forecast goal is ready. I'll model scenarios from ${source}, document assumptions, and ${automated ? "refresh on " + scheduleText : "update when you ask"}.`,
+        feed: [
+          { action: `connected to ${source} and pulled historical series`, time: "just now" },
+          { action: "built a baseline forecast with confidence bands", time: "just now" },
+          { action: `enabled ${secondary.label.toLowerCase()} — ${secondary.detail.toLowerCase()}`, time: "just now" },
+        ],
+        metrics: [
+          { metric: "Forecast horizon", value: "90 days", change: "configured", dir: "up", spark: [42, 44, 43, 45, 46, 47, 48] },
+          { metric: "Confidence", value: "Baseline", change: "building", dir: "up", spark: [50, 51, 52, 51, 53, 54, 55] },
+        ],
+        annotation: { topic: "assumptions", text: `Share any constraints or scenarios — I'll refine ${goal.toLowerCase()} against ${source}.` },
+        watching: [`${goal} — ${cadence}`, `${secondary.label} — ${secondary.detail}`, `Historical data from ${source}`],
+      },
+    };
+
+    const profile = profiles[cap] || {
+      title: goal,
+      summary: `Your goal "${goal}" is live. ${agent} is reading from ${source} as a ${role} and will ${automated ? "run on " + scheduleText : "work on demand"}.`,
+      feed: [
+        { action: `connected to ${source} for ${goal.toLowerCase()}`, time: "just now" },
+        { action: `scoped tasks for ${role}`, time: "just now" },
+        { action: `${secondary.label} — ${secondary.detail}`, time: "just now" },
+      ],
+      metrics: [
+        { metric: "Goal status", value: "Live", change: "just set up", dir: "up", spark: [40, 42, 44, 45, 46, 47, 48] },
+        { metric: "Data source", value: source, change: "connected", dir: "up", spark: [46, 47, 48, 48, 47, 48, 48] },
+      ],
+      annotation: { topic: "next step", text: state.agentInfo?.summary || `Ask ${agent} anything about ${goal.toLowerCase()}.` },
+      watching: [`${goal} — ${cadence}`, `${secondary.label} — ${secondary.detail}`, `Data from ${source}`],
+    };
+
+    return {
+      title: profile.title,
+      agent,
+      updated: "just now",
+      subtitle: `${goal} · configured from onboarding · reading from ${source} · ${role}`,
+      feed: profile.feed,
+      summary: profile.summary,
+      metrics: profile.metrics,
+      annotation: profile.annotation,
+      watching: profile.watching,
+    };
+  }
+
+  function goalFolderName(goal, capability) {
+    const byAchievement = {
+      "Keep KPIs healthy": "KPI health operations",
+      "Track revenue & churn": "Revenue & churn watchlist",
+      "Alert me when metrics drop": "Threshold & alert rules",
+      "Find trends and outliers": "Trend analysis workspace",
+      "Compare segments": "Segment comparison notes",
+      "Summarize key metrics": "Metric summary hub",
+      "Weekly stakeholder report": "Stakeholder report runbook",
+      "Daily ops snapshot": "Daily ops delivery",
+      "Monthly board summary": "Board reporting pack",
+      "Project next quarter revenue": "Revenue forecast models",
+      "Estimate churn risk": "Churn risk workspace",
+      "Model growth scenarios": "Growth scenario planning",
+      "Save time on recurring work": "Automation runbook",
+      "Make data-driven decisions": "Decision support notes",
+      "Keep the team aligned": "Team alignment hub",
+    };
+    let name = byAchievement[goal];
+    if (!name) {
+      const byCap = {
+        "Monitor a KPI": "KPI monitoring ops",
+        "Analyse a dataset": "Dataset exploration hub",
+        "Run reports on schedule": "Scheduled reporting ops",
+        "Forecast something": "Forecasting workspace",
+        "Something else": "Custom goal runbook",
+      };
+      name = byCap[capability] || "Goal operations";
+    }
+    if (name.toLowerCase() === goal.toLowerCase()) name += " · runbook";
+    return name;
+  }
+
+  function buildUserGoalAssets(plan) {
+    const cap = state.ob.capability || "Something else";
+    const goal = plan.goal;
+    const agent = plan.agentName;
+    const folderId = "user-goal-kb";
+    const alt = goalFolderName(goal, cap);
+    const base = { folderId, agent, updated: "just now" };
+    const profiles = {
+      "Monitor a KPI": [
+        { id: "asset-user-tracker", type: "live-tracker", title: `${alt} · live`, docId: "kpi-monitoring" },
+        { id: "asset-user-kpi", type: "kpi-dashboard", title: "Primary KPI board", docId: "kpi-monitoring" },
+      ],
+      "Analyse a dataset": [
+        { id: "asset-user-analysis", type: "report", title: `${alt} · analysis`, docId: "kpi-monitoring" },
+      ],
+      "Run reports on schedule": [
+        { id: "asset-user-report", type: "report", title: `${alt} · report`, docId: "kpi-monitoring" },
+      ],
+      "Forecast something": [
+        { id: "asset-user-forecast", type: "dashboard", title: `${alt} · forecast`, docId: "kpi-monitoring" },
+      ],
+    };
+    return (profiles[cap] || [{ id: "asset-user-goal", type: "report", title: alt, docId: "kpi-monitoring" }])
+      .map(a => ({ ...base, ...a }));
+  }
+
+  function folderSuggestions(folder, plan) {
+    const cap = plan ? state.ob.capability : null;
+    const goal = plan?.goal || folder.goal;
+    if (goal && cap) {
+      const byCap = {
+        "Monitor a KPI": [`What's in the live tracker?`, "When does the KPI board refresh?", "Can another agent extend this?"],
+        "Analyse a dataset": ["Summarize the analysis report", "Any updates since last run?", "What would Ada add from pipeline data?"],
+        "Run reports on schedule": ["When is the next report due?", "Who last edited this?", "Show related assets"],
+        "Forecast something": ["What's in the forecast dashboard?", "Which assumptions changed?", "Can Florence validate against KPIs?"],
+      };
+      return byCap[cap] || [`What's in this folder?`, "Which agent produced these?", "What can iterate on this?"];
+    }
+    return ["What's in the library?", "Which agent produced these assets?", "Can agents build on each other's work?"];
+  }
+
+  function setupUserGoalLibrary(plan) {
+    const folderId = "user-goal-kb";
+    const folderTitle = goalFolderName(plan.goal, state.ob.capability);
+    const folder = {
+      id: folderId,
+      icon: "📁",
+      title: folderTitle,
+      goal: plan.goal,
+      intro: `Assets produced for “${plan.goal}” by ${plan.agentName}. Shared with the whole fleet — any agent can read and iterate on previous work.`,
+      suggestions: folderSuggestions(null, plan),
+    };
+    const idx = KB_FOLDERS.findIndex(f => f.id === folderId);
+    if (idx >= 0) KB_FOLDERS[idx] = folder;
+    else KB_FOLDERS.push(folder);
+    Object.keys(KB_ASSETS).filter(k => KB_ASSETS[k].folderId === folderId).forEach(k => delete KB_ASSETS[k]);
+    buildUserGoalAssets(plan).forEach(a => { KB_ASSETS[a.id] = a; });
+    state.wb.openWiki = folderId;
+    return folder;
+  }
+
+  function assetTypeMeta(type) {
+    return ASSET_TYPES[type] || { icon: "📄", label: "Asset" };
+  }
+  function folderAssets(folderId) {
+    return Object.values(KB_ASSETS).filter(a => a.folderId === folderId);
+  }
+  function assetForDoc(docId) {
+    return Object.values(KB_ASSETS).find(a => a.docId === docId);
+  }
+  function assetCard(a, compact) {
+    const tm = assetTypeMeta(a.type);
+    const pad = compact ? "p-4" : "p-5";
+    return `<button data-action="open-asset" data-asset="${a.id}" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm ${pad} hover:border-violet-300 cursor-pointer w-full">
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <span class="text-xl">${tm.icon}</span>
+        <span class="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">${esc(tm.label)}</span>
+      </div>
+      <p class="text-sm font-bold text-zinc-900">${esc(a.title)}</p>
+      <p class="text-xs text-zinc-400 mt-1">${esc(a.agent)} · ${esc(a.updated)}</p>
+    </button>`;
+  }
+
+  function docQuickQuestions() {
+    const cap = state.agentInfo?.capability || state.ob.capability;
+    const byCap = {
+      "Monitor a KPI": ["What's the current status?", "When is the next check?", "What thresholds are set?"],
+      "Analyse a dataset": ["What did you find so far?", "Any outliers or gaps?", "What should I look at first?"],
+      "Run reports on schedule": ["When is the next report?", "Who receives it?", "Can I preview the draft?"],
+      "Forecast something": ["What's the baseline forecast?", "What assumptions did you use?", "Show scenario options"],
+    };
+    return byCap[cap] || ["What's the status?", "What happens next?", "What are you watching?"];
+  }
+
+  function mockAgentForGoal(agent, q) {
+    const goal = state.agentInfo?.goal;
+    const source = state.ob.dataSource || "your data source";
+    if (!goal || state.wb.openDoc !== "kpi-monitoring") {
+      return agent === "Ada" ? mockAda(q) : mockFlorence(q);
+    }
+    const s = q.toLowerCase();
+    const cap = state.agentInfo.capability || state.ob.capability;
+    if (/status|how.*going|current/.test(s)) {
+      return `Your "${goal}" goal is live and reading from ${source}. ${DOC_CONTENT["kpi-monitoring"]?.summary || "Everything is set up."}`;
+    }
+    if (/next|when|schedule/.test(s)) {
+      const note = DOC_CONTENT["kpi-monitoring"]?.annotation?.text;
+      return note || (state.ob.wantAutomate ? `Next run follows your ${state.ob.schedule ? scheduleDetail(state.ob.schedule) : "recurring"} schedule.` : "I'm ready whenever you ask — no fixed schedule yet.");
+    }
+    if (/watch|threshold|monitor/.test(s)) {
+      const watching = DOC_CONTENT["kpi-monitoring"]?.watching || [];
+      return watching.length ? `I'm watching: ${watching.join("; ")}.` : `Focused on ${goal} from ${source}.`;
+    }
+    if (cap === "Analyse a dataset" && /outlier|find|trend/.test(s)) {
+      return `Still building the baseline on ${source}. Tell me which columns or segments matter most for ${goal.toLowerCase()}.`;
+    }
+    if (cap === "Forecast something" && /forecast|scenario|assumption/.test(s)) {
+      return `Baseline forecast is in place from ${source}. Share a scenario or constraint and I'll stress-test ${goal.toLowerCase()}.`;
+    }
+    return `Happy to help with "${goal}" — what would you like to know?`;
+  }
+
+  function buildArtifactTasks(detailOverride) {
+    const plan = buildPlan();
+    if (!detailOverride) return plan.tasks.map((t) => ({ label: t.label, detail: t.detail }));
+    return [{ label: plan.tasks[0].label, detail: detailOverride }, plan.tasks[1]];
+  }
+
+  function planRevealStep() {
+    const plan = buildPlan();
+    return { ...SCRIPT[4], planCard: plan, artifact: { planStep: 3, tasks: plan.tasks.map((t) => ({ label: t.label, detail: t.detail })) } };
+  }
+
+  function connectionMeta(tool) {
+    return DATA_CONNECTIONS.find(c => c.name === tool) || { name: tool, emoji: "🔗", desc: "Data source" };
+  }
+
+  function withArtifactTasks(step, detailOverride) {
+    if (!step.artifact) return step;
+    return { ...step, artifact: { ...step.artifact, tasks: buildArtifactTasks(detailOverride) } };
+  }
+
+  function scheduleDetail(text) {
+    if (text.includes("Specific time")) return "specific time · daily/weekly/monthly";
+    if (text.includes("intervals")) return "interval-based · recurring";
+    if (text.includes("condition")) return "event-triggered · on condition";
+    if (text.includes("Something else")) return "custom schedule";
+    return "automated · recurring";
+  }
+
+  function getScriptStep(stepIndex, userText) {
+    if (/execute first task/i.test(String(userText).trim())) return planRevealStep();
+    if (stepIndex === 0) return { ...SCRIPT[0], suggestions: achievementSuggestions(state.ob.capability || userText) };
+    if (stepIndex === 1) {
+      state.ob.achievement = String(userText).trim();
+      return withArtifactTasks(SCRIPT[1], "scope defined · schedule TBD");
+    }
+    if (stepIndex === 2) {
+      state.ob.wantAutomate = /^yes$/i.test(String(userText).trim());
+      const step = state.ob.wantAutomate ? SCRIPT[2] : SCRIPT[3];
+      return withArtifactTasks(step, state.ob.wantAutomate ? "recurring · schedule TBD" : "data source · pending connection");
+    }
+    if (stepIndex === 3) {
+      if (state.ob.wantAutomate && SCHEDULE_OPTIONS.includes(userText)) {
+        state.ob.schedule = userText;
+        return withArtifactTasks(SCRIPT[3], scheduleDetail(userText));
+      }
+      return planRevealStep();
+    }
+    if (stepIndex === 4) return state.ob.wantAutomate ? planRevealStep() : withArtifactTasks(SCRIPT[5]);
+    return withArtifactTasks(SCRIPT[5]);
+  }
 
   const DOCUMENTS = [
     { id: "kpi-monitoring", title: "KPI Monitoring", freshness: "just now", agent: "Florence", status: "fresh", badge: "New" },
@@ -218,6 +768,10 @@
         tools: ["Snowflake", "Slack", "Google analytics"],
       },
       status: "online", gateway: 8642, sessions: 12, isDefault: true,
+      subagents: [
+        { name: "Retention Scout", emoji: "🔍", role: "Watches Day-7 retention daily", status: "online" },
+        { name: "Report Drafter", emoji: "📝", role: "Prepares weekly KPI narrative", status: "idle" },
+      ],
       config: { provider: "Anthropic", model: "claude-sonnet-4", sources: ["Snowflake"], integrations: ["Slack", "dbt"] },
     },
     Ada: {
@@ -237,20 +791,36 @@
         tools: ["Hubspot", "PagerDuty"],
       },
       status: "online", gateway: 8643, sessions: 8, isDefault: false,
+      subagents: [
+        { name: "Freshness Guard", emoji: "⏱️", role: "Monitors model SLA breaches", status: "online" },
+        { name: "Schema Watcher", emoji: "🔬", role: "Logs overnight schema drift", status: "idle" },
+      ],
       config: { provider: "Anthropic", model: "claude-sonnet-4", sources: ["Snowflake", "dbt Cloud"], integrations: ["PagerDuty"] },
     },
   };
   const AGENTS = PROFILES;
-  const WIKI_PAGES = [
-    { id: "overview", icon: "📖", title: "Overview · how to use this memory" },
-    { id: "semantic", icon: "📐", title: "Semantic layer" },
-    { id: "entities", icon: "🔗", title: "Entities & relationships" },
-    { id: "sources", icon: "🗄️", title: "Data sources & ownership" },
-    { id: "conventions", icon: "⚠️", title: "Conventions & gotchas" },
-    { id: "stakeholders", icon: "📅", title: "Stakeholders & cadences" },
-    { id: "glossary", icon: "🔤", title: "Glossary" },
-    { id: "runbooks", icon: "📋", title: "Runbooks / SLAs" },
+  const ASSET_TYPES = {
+    report: { icon: "📄", label: "Analysis report" },
+    dashboard: { icon: "📊", label: "Dashboard" },
+    "kpi-dashboard": { icon: "🎯", label: "KPI dashboard" },
+    "live-tracker": { icon: "📡", label: "Live tracker" },
+  };
+  const KB_FOLDERS = [
+    {
+      id: "team-library",
+      icon: "📁",
+      title: "Team library",
+      goal: null,
+      intro: "Reports, dashboards, and live trackers produced by your agents. Databao surfaces them here — every agent reads this library and can iterate on prior work.",
+      suggestions: ["What's in the library?", "Which agent produced the latest report?", "Can agents build on each other's assets?"],
+    },
   ];
+  const KB_ASSETS = {
+    "asset-kpi-weekly": { id: "asset-kpi-weekly", folderId: "team-library", type: "report", title: "Weekly KPI Report", agent: "Florence", updated: "12 min ago", docId: "kpi-weekly" },
+    "asset-retention": { id: "asset-retention", folderId: "team-library", type: "report", title: "Retention Deep-Dive", agent: "Florence", updated: "1 hr ago", docId: "retention" },
+    "asset-pipeline": { id: "asset-pipeline", folderId: "team-library", type: "dashboard", title: "Pipeline Health", agent: "Ada", updated: "3 min ago", docId: "pipeline-health" },
+    "asset-metric-defs": { id: "asset-metric-defs", folderId: "team-library", type: "dashboard", title: "Metric Definitions", agent: "Ada", updated: "2 days ago", docId: "metric-defs" },
+  };
   const DOC_CONTENT = {
     "kpi-monitoring": { title: "KPI Monitoring", agent: "Florence", updated: "just now", subtitle: "Your new goal · configured from onboarding · reading from Snowflake", feed: [{ action: "connected to Snowflake and mapped your revenue & churn tables", time: "just now" }, { action: "set up weekly monitoring — first report drafts Monday 08:00", time: "just now" }, { action: "validated metrics against your canonical definitions", time: "just now" }], summary: "This is your first goal, just set up. I'll watch your core KPIs — revenue and churn — and draft a report every Monday.", metrics: [{ metric: "Revenue (MRR)", value: "$142.3K", change: "tracking", dir: "up", spark: [40,42,41,44,45,44,47] }, { metric: "Churn Rate", value: "3.1%", change: "tracking", dir: "up", spark: [2.8,2.9,2.9,3.0,2.9,3.0,3.1] }], annotation: { topic: "what happens next", text: "I'm live now. Your first full report lands Monday at 08:00." }, watching: ["Revenue (MRR) — weekly, alert on sharp moves", "Churn rate — alert if it crosses 3.5%", "First report scheduled · Monday 08:00"] },
     "kpi-weekly": { title: "Weekly KPI Report", agent: "Florence", updated: "12 min ago", subtitle: "Week 27 · Jul 1 – Jul 7, 2026 · auto-refreshed from Snowflake", feed: [{ action: "refreshed all KPI figures from Snowflake", time: "12 min ago" }, { action: "flagged Day-7 retention drop", time: "12 min ago" }], summary: "Revenue continues its steady climb at +2.1% week-over-week, now at $142.3K MRR. The main concern is Day-7 retention, down 14%.", metrics: [{ metric: "Revenue (MRR)", value: "$142.3K", change: "+2.1%", dir: "up", spark: [40,42,41,44,45,44,47] }, { metric: "Day-7 Retention", value: "31.2%", change: "-14%", dir: "down", flagged: true, spark: [45,44,46,43,38,34,31] }, { metric: "Weekly Active Users", value: "8,412", change: "+4.8%", dir: "up", spark: [60,62,61,65,68,70,72] }, { metric: "Churn Rate", value: "3.1%", change: "+0.2pp", dir: "down", spark: [2.8,2.9,2.9,3.0,2.9,3.0,3.1] }], annotation: { topic: "Day-7 retention drop", text: "The drop correlates with the onboarding flow change deployed Nov 28." }, watching: ["Retention cohorts post-Nov 28", "Churn rate — alert if it crosses 3.5%"] },
@@ -266,12 +836,15 @@
   const state = {
     phase: "onboarding",
     agentInfo: null,
-    ob: { screen: "landing", messages: [], input: "", typing: false, tasks: [], planStep: 0, msgCount: 0, planConfirmed: false, conn: {} },
+    ob: { screen: "landing", messages: [], input: "", typing: false, tasks: [], planStep: 0, msgCount: 0, planConfirmed: false, conn: {}, userRole: null, capability: null, achievement: null, awaitingRole: false, wantAutomate: false, schedule: null, dataSource: null },
     wb: {
-      view: "home", openDoc: "kpi-weekly", openWiki: "overview", openAgent: null, activeProfile: "Florence",
-      kbExpanded: false, askOpen: true, askMessages: [], askInput: "", askTyping: false,
-      dbMessages: [], dbInput: "", dbTyping: false, doneNeeds: [],
+      view: "home", openDoc: "kpi-weekly", openWiki: "team-library", openAgent: null, openAsset: null, activeProfile: "Florence",
+      kbExpanded: false, askOpen: true, chatFocused: false, askMessages: [], askInput: "", askTyping: false,
+      dbMessages: [], dbInput: "", dbTyping: false, chatContext: [], doneNeeds: [],
       profileSessions: { Florence: [], Ada: [] }, profileTab: "overview", showCreateProfile: false,
+      showAddSkill: false, showAddSubagent: false,
+      newSkill: { name: "", desc: "", level: "Developing" },
+      newSubagent: { name: "", emoji: "🤖", role: "" },
       newProfile: { name: "", emoji: "🤖", role: "", soul: "" },
     },
   };
@@ -307,91 +880,97 @@
     const s = q.toLowerCase();
     const w = state.wb;
     if (w.view === "wiki") {
-      const pg = WIKI_PAGES.find(p => p.id === w.openWiki) || WIKI_PAGES[0];
-      if (pg.id === "overview") {
-        if (s.includes("agent") || s.includes("use")) return "Agents read this wiki before acting — semantic layer, conventions, and entity relationships. Proposed edits go through review before merging.";
-        if (s.includes("store") || s.includes("what")) return "Runbooks, metric definitions, ownership, gotchas, and stakeholder cadences — anything the fleet needs to stay aligned.";
-        if (s.includes("maintain") || s.includes("who")) return "Agents draft and refresh pages; your data team approves changes. Florence and Ada keep their sections current.";
+      const folder = KB_FOLDERS.find(f => f.id === w.openWiki) || KB_FOLDERS[0];
+      if (!folder) return "Your agent library is empty — assets appear here as agents produce reports, dashboards, and trackers.";
+      const assets = folderAssets(folder.id);
+      if (s.includes("library") || s.includes("asset") || s.includes("folder")) {
+        return assets.length
+          ? `This folder has ${assets.length} asset${assets.length === 1 ? "" : "s"}: ${assets.map(a => a.title).join(", ")}. All agents can read and iterate on them.`
+          : "Agents publish reports, dashboards, KPI boards, and live trackers into folders here.";
       }
-      if (pg.id === "semantic") {
-        if (s.includes("what") || s.includes("layer")) return "The semantic layer maps business metrics to warehouse tables — MRR, churn, activation, and 34 canonical definitions synced from dbt.";
-        if (s.includes("valid")) return "Agents cross-check queries against these definitions before computing or alerting. Drift between teams gets flagged automatically.";
-        if (s.includes("defin") || s.includes("metric")) return "Activation = 3+ core actions within 7 days. I can open Ada's Metric Definitions doc for the full list.";
+      if (s.includes("agent") || s.includes("produce") || s.includes("who")) {
+        const producers = [...new Set(assets.map(a => a.agent))];
+        return producers.length ? `${producers.join(" and ")} produced assets in this folder. Any teammate can extend their work.` : "Agents add assets here as they complete tasks.";
       }
-      if (pg.id === "entities") {
-        if (s.includes("entit") || s.includes("map")) return "Core entities: users, accounts, subscriptions, and events — linked via user_id and account_id across fct_* and dim_* models.";
-        if (s.includes("relationship")) return "Users belong to accounts; subscriptions roll up to MRR. Event streams tie back to both for retention cohorts.";
-        if (s.includes("table") || s.includes("link")) return "dim_users ↔ dim_accounts via account_id; fct_events joins on user_id. Florence uses these for cohort analysis.";
+      if (s.includes("iterat") || s.includes("build") || s.includes("extend")) {
+        return "Yes — the library is shared across the fleet. Florence can refine Ada's dashboards; Ada can wire fresh data into Florence's reports.";
       }
-      if (pg.id === "sources") {
-        if (s.includes("own") || s.includes("snowflake")) return "Snowflake is the primary warehouse — read-only access, owned by the data platform team. Revoke anytime from settings.";
-        if (s.includes("connect") || s.includes("source")) return "Snowflake (live), with spreadsheets archived. All agents read from the semantic layer, not raw tables.";
-        if (s.includes("fresh") || s.includes("sla")) return "Critical models refresh daily by 06:00 UTC. Ada monitors freshness and auto-fixes stalled upstream jobs.";
-      }
-      if (pg.id === "conventions") {
-        if (s.includes("gotcha") || s.includes("common")) return "Timezone is always UTC in the warehouse. Signup date ≠ activation date. Null emails in dim_customers are a known 8.4% issue.";
-        if (s.includes("nam")) return "fct_* for facts, dim_* for dimensions, stg_* for staging. Metrics use snake_case; dashboards use Title Case.";
-        if (s.includes("analyst") || s.includes("new")) return "Start with the glossary and metric definitions. Never query raw events without the activation filter.";
-      }
-      if (pg.id === "stakeholders") {
-        if (s.includes("report") || s.includes("receive")) return "Weekly KPI report goes to #data-alerts and the growth leadership group every Monday 08:00.";
-        if (s.includes("cadence") || s.includes("review")) return "KPI review is weekly; pipeline health is daily. Retention deep-dives are ad hoc when Florence flags a drop.";
-        if (s.includes("team") || s.includes("depend")) return "Growth, product, and finance depend on MRR and retention metrics. Engineering relies on Ada's pipeline runbooks.";
-      }
-      if (pg.id === "glossary") {
-        if (s.includes("activ")) return "Activation = 3+ core actions within 7 days of signup. It's the north-star input to Day-7 retention.";
-        if (s.includes("mrr") || s.includes("arr")) return "MRR = sum of active subscription amounts, normalized monthly. ARR = MRR × 12. We report MRR in weekly KPIs.";
-        if (s.includes("retention") || s.includes("day-7")) return "Day-7 retention = % of signups still active 7 days later. Currently 31.2%, down 14% since the Nov 28 modal change.";
-      }
-      if (pg.id === "runbooks") {
-        if (s.includes("fail") || s.includes("pipeline")) return "If a model fails freshness: Ada re-triggers upstream, re-runs downstream, and logs the incident. Escalate if not green in 30 min.";
-        if (s.includes("sla") || s.includes("on-call")) return "P1 pipeline breach: 30 min response. P2 schema drift: same business day. On-call rotates through the data platform team.";
-        if (s.includes("escalat")) return "L1: Ada auto-remediation → L2: data platform on-call → L3: eng lead if customer-facing metrics are stale past 09:00 UTC.";
-      }
-      return `I can help with "${pg.title}" — ask about what's documented here or how agents use it.`;
+      return `I can help with “${folder.title}” — ask about assets, producers, or what another agent could add next.`;
     }
     if (s.includes("attention")) return "Florence flagged a 14% drop in Day-7 retention tied to the Nov 28 onboarding modal.";
     if (s.includes("summar")) return "This week: 58 tasks done, ~6h saved. Two goals active — KPIs need your call on retention.";
     if (s.includes("retention")) return "Florence traced it to the Nov 28 modal. Want me to open her report?";
     if (s.includes("marketing") || s.includes("goal")) return "I can spin up a new goal — tell me which metrics matter and where the data lives.";
-    return "I can route that to the right agent or pull a summary across your goals.";
+    if (s.includes("library") || s.includes("asset")) {
+      const count = Object.keys(KB_ASSETS).length;
+      return `The library has ${count} assets across ${KB_FOLDERS.length} folders — reports, dashboards, KPI boards, and live trackers. All agents can read and iterate on them.`;
+    }
+    if (w.view === "profiles") {
+      const created = tryCreateAgentTypeFromDb(q);
+      if (created?.created) return `Created agent type "${created.name}" for ${created.role}. Open their profile to customize skills, subagents, or ask them to self-configure in chat.`;
+      if (created?.exists) return `"${created.name}" already exists — open their configuration page to refine skills or add subagents.`;
+      if (created?.drafted || s.includes("agent type") || s.includes("new agent")) return "Tell me the role and what they should own — e.g. \"Create a marketing analytics agent\" — and I'll draft the full profile.";
+      if (s.includes("what agent") || s.includes("types")) return `You have ${Object.keys(PROFILES).length} agent types: ${Object.keys(PROFILES).join(", ")}. Each can own skills, subagents, and produce library assets.`;
+    }
+    return "I manage your agents and their shared asset library — ask me to route a question, surface recent work, or create a new agent type.";
   }
-
-  const WIKI_SUGGESTIONS = {
-    overview: ["How do agents use this wiki?", "What should be stored here?", "Who maintains the knowledge base?"],
-    semantic: ["What's in the semantic layer?", "How do agents validate metrics?", "Show metric definitions"],
-    entities: ["What entities are mapped?", "How are relationships defined?", "Which tables link users to accounts?"],
-    sources: ["Who owns Snowflake data?", "Which sources are connected?", "What's the freshness SLA?"],
-    conventions: ["What are common gotchas?", "Any naming conventions?", "What should new analysts know?"],
-    stakeholders: ["Who receives weekly reports?", "What's the KPI review cadence?", "Which teams depend on this data?"],
-    glossary: ["Define activation", "What's MRR vs ARR?", "Explain Day-7 retention"],
-    runbooks: ["What if a pipeline fails?", "What's the on-call SLA?", "Show escalation paths"],
-  };
 
   function dbQuickButtons(questions) {
     return questions.map(q => `<button data-action="db-quick" data-text="${esc(q)}" class="w-full text-left text-sm px-3.5 py-2.5 rounded-xl border border-zinc-200 text-zinc-600 hover:border-zinc-200 cursor-pointer mb-2">${esc(q)}</button>`).join("");
   }
 
+  function ctxActive(text) {
+    return state.wb.chatContext.some(c => c.text === text.trim()) ? " wb-context-active" : "";
+  }
+  function ctxAction(text) {
+    return `data-action="add-context" data-context-text="${esc(text.trim())}"`;
+  }
+  function toggleChatContext(text) {
+    const t = text.trim();
+    if (!t) return;
+    const w = state.wb;
+    const idx = w.chatContext.findIndex(c => c.text === t);
+    if (idx >= 0) w.chatContext.splice(idx, 1);
+    else { w.chatContext.push({ id: Date.now(), text: t }); w.askOpen = true; }
+    render();
+  }
+  function chatContextBar() {
+    const items = state.wb.chatContext;
+    if (!items.length) return "";
+    return `<div class="px-5 pt-2 flex flex-wrap gap-1.5 shrink-0">
+      <span class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide self-center mr-1">Context</span>
+      ${items.map(c => `<span class="inline-flex items-center gap-1 max-w-[180px] text-[11px] bg-violet-50 text-violet-700 border border-violet-200 rounded-lg px-2 py-1">
+        <span class="truncate">${esc(c.text.length > 60 ? c.text.slice(0, 57) + "…" : c.text)}</span>
+        <button data-action="remove-context" data-id="${c.id}" class="shrink-0 text-violet-400 hover:text-violet-700 cursor-pointer leading-none">×</button>
+      </span>`).join("")}
+    </div>`;
+  }
+
   function databaoEmptyState() {
     const w = state.wb;
     if (w.view === "wiki") {
-      const pg = WIKI_PAGES.find(p => p.id === w.openWiki) || WIKI_PAGES[0];
-      const suggestions = WIKI_SUGGESTIONS[pg.id] || WIKI_SUGGESTIONS.overview;
-      return `<div class="pt-0 text-center"><p class="text-sm font-bold mt-3">Ask about this page</p><p class="text-xs text-zinc-400 mt-2 mb-5">${esc(pg.title)} · I'll pull from the knowledge base.</p>${dbQuickButtons(suggestions)}</div>`;
+      const folder = KB_FOLDERS.find(f => f.id === w.openWiki) || KB_FOLDERS[0];
+      if (!folder) return `<div class="pt-0 text-center"><p class="text-sm text-zinc-400 py-8">Agents will publish assets here as they work.</p></div>`;
+      const suggestions = folder.suggestions || folderSuggestions(folder);
+      return `<div class="pt-0 text-center"><p class="text-sm font-bold mt-3">Ask about this library</p><p class="text-xs text-zinc-400 mt-2 mb-1">${esc(folder.title)}</p>${folder.goal ? `<p class="text-xs text-zinc-400 mb-5">Goal: ${esc(folder.goal)} · shared across agents</p>` : `<p class="text-xs text-zinc-400 mb-5">All agents read and iterate on assets here.</p>`}${dbQuickButtons(suggestions)}</div>`;
     }
-    return `<div class="pt-0 text-center"><p class="text-sm font-bold mt-3">Hi I'm Databao</p><p class="text-xs text-zinc-400 mt-2 mb-5">Ask for the big picture — I'll route it to the right agent.</p>${dbQuickButtons(["What needs my attention?","Summarize this week","Add a goal for marketing metrics"])}</div>`;
+    if (w.view === "profiles") {
+      return `<div class="pt-0 text-center"><p class="text-sm font-bold mt-3">Configure your fleet</p><p class="text-xs text-zinc-400 mt-2 mb-5">Ask me to draft a new agent type — I'll set up persona, skills, tools, and gateway.</p>${dbQuickButtons(["Create a marketing analytics agent","Create a pipeline reliability agent","What agent types do we have?"])}</div>`;
+    }
+    return `<div class="pt-0 text-center"><p class="text-sm font-bold mt-3">Hi I'm Databao</p><p class="text-xs text-zinc-400 mt-2 mb-5">I manage your agents and the library of reports, dashboards, and trackers they produce.</p>${dbQuickButtons(["What needs my attention?","Show recent library assets","Which agent should I talk to?"])}</div>`;
   }
 
   function planCard(plan, confirmed, msgIdx) {
     const emoji = { Florence: "👩‍💻", Ada: "🧑‍💻" }[plan.agentName] || "👩‍💻";
+    const sourceMeta = connectionMeta(plan.source);
     return `<div class="border border-zinc-200 rounded-xl overflow-hidden max-w-md bg-white shadow-sm">
       <div class="px-5 py-4 border-b border-zinc-200"><p class="text-xs text-zinc-400 mb-1">Here's the plan</p><div class="flex items-center gap-2"><span>🎯</span><p class="text-sm font-bold text-zinc-900">${esc(plan.goal)}</p></div></div>
       <div class="px-5 py-4">
         <div class="flex items-center gap-2 mb-3"><span class="text-lg">${emoji}</span><div><p class="text-sm font-semibold text-zinc-800">${esc(plan.agentName)}</p><p class="text-xs text-zinc-400">will own this goal</p></div></div>
         ${plan.tasks.map(t=>`<div class="flex items-start gap-2.5 mb-2"><span class="text-violet-400 mt-0.5">${ICON.check}</span><div><p class="text-sm font-medium text-zinc-800">${esc(t.label)}</p><p class="text-xs text-zinc-400">${esc(t.detail)}</p></div></div>`).join("")}
-        <div class="flex items-center gap-2 text-xs text-zinc-500 bg-zinc-50 rounded-lg px-3 py-2 mb-4 mt-3"><span>❄️</span><span>Reading from ${esc(plan.source)} · read-only</span></div>
-        ${confirmed ? `<div class="flex items-center justify-center gap-2 h-10 rounded-lg bg-green-50 text-green-600 text-sm font-semibold">${ICON.check} Goal created</div>` :
-          `<div class="flex gap-2"><button data-action="confirm-plan" data-idx="${msgIdx}" class="flex-1 h-10 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold cursor-pointer">Confirm & create goal</button>
+        <div class="flex items-center gap-2 text-xs text-zinc-500 bg-zinc-50 rounded-lg px-3 py-2 mb-4 mt-3"><span>${sourceMeta.emoji}</span><span>Reading from ${esc(plan.source)} · read-only</span></div>
+        ${confirmed ? `<div class="flex items-center justify-center gap-2 h-10 rounded-lg bg-green-50 text-green-600 text-sm font-semibold">${ICON.check} First task running</div>` :
+          `<div class="flex gap-2"><button data-action="confirm-plan" data-idx="${msgIdx}" class="flex-1 h-10 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold cursor-pointer">Execute first task</button>
           <button data-action="edit-plan" class="h-10 px-4 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 text-sm cursor-pointer">Edit</button></div>`}
       </div></div>`;
   }
@@ -407,64 +986,169 @@
   }
 
   function connectionForm(tool, key) {
-    const c = state.ob.conn[key] || { phase: "input", accountId: "" };
+    const meta = connectionMeta(tool);
+    const c = state.ob.conn[key] || { phase: "input", accountId: "", selectedTool: tool };
     const active = c.accountId.trim().length > 0;
-    if (c.phase === "done") return `<div class="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-zinc-200 rounded-xl px-4 py-3 max-w-sm">${ICON.check}<span>${esc(tool)} authorized · read-only</span></div>`;
-    if (c.phase === "redirecting") return `<div class="border border-zinc-200 rounded-xl px-4 py-5 max-w-sm bg-white shadow-sm flex items-center gap-3"><div class="w-4 h-4 rounded-full border-2 border-zinc-200 border-t-violet-500 spinner"></div><div><p class="text-sm text-zinc-700">Redirecting to ${esc(tool)}…</p></div></div>`;
-    return `<div class="border border-zinc-200 rounded-xl overflow-hidden max-w-sm bg-white shadow-sm">
-      <div class="px-4 py-3.5 flex items-center gap-3 border-b border-zinc-200"><div class="w-9 h-9 rounded-lg bg-zinc-50 border flex items-center justify-center">❄️</div><div><p class="text-sm font-semibold text-zinc-900">Connect ${esc(tool)}</p><p class="text-xs text-zinc-400">Read-only · revoke anytime</p></div></div>
-      <div class="px-4 py-3.5 space-y-3"><input data-action="conn-input" data-key="${key}" value="${esc(c.accountId)}" placeholder="acme-xy12345" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none focus:border-zinc-200"/>
+    if (c.phase === "done") return `<div class="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-zinc-200 rounded-xl px-4 py-3">${ICON.check}<span>${esc(tool)} authorized · read-only</span></div>`;
+    if (c.phase === "redirecting") return `<div class="border border-zinc-200 rounded-xl px-4 py-5 bg-white shadow-sm flex items-center gap-3"><div class="w-4 h-4 rounded-full border-2 border-zinc-200 border-t-violet-500 spinner"></div><div><p class="text-sm text-zinc-700">Redirecting to ${esc(tool)}…</p></div></div>`;
+    return `<div class="border border-zinc-200 rounded-xl overflow-hidden bg-white shadow-sm">
+      <div class="px-4 py-3.5 flex items-center gap-3 border-b border-zinc-200"><div class="w-9 h-9 rounded-lg bg-zinc-50 border flex items-center justify-center text-lg">${meta.emoji}</div><div><p class="text-sm font-semibold text-zinc-900">Connect ${esc(tool)}</p><p class="text-xs text-zinc-400">${esc(meta.desc)} · read-only · revoke anytime</p></div></div>
+      <div class="px-4 py-3.5 space-y-3"><input data-action="conn-input" data-key="${key}" value="${esc(c.accountId)}" placeholder="Account ID or connection name" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none focus:border-zinc-200"/>
       <button data-action="conn-connect" data-key="${key}" data-tool="${esc(tool)}" ${active ? "" : "disabled"} class="w-full h-9 rounded-lg text-sm font-semibold transition-colors ${active ? "bg-violet-500 hover:bg-violet-600 text-white cursor-pointer" : "bg-zinc-100 text-zinc-300 cursor-not-allowed"}">Continue with ${esc(tool)} →</button></div></div>`;
   }
 
-  function obSkel(h, w) {
-    return `<div class="ob-skel rounded-lg ${h} ${w || "w-full"}"></div>`;
+  function connectionPicker(key) {
+    const c = state.ob.conn[key] || { phase: "pick", selectedTool: null, accountId: "" };
+    if (c.phase === "done") {
+      const tool = c.selectedTool || state.ob.dataSource || "Snowflake";
+      return `<div class="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-zinc-200 rounded-xl px-4 py-3">${ICON.check}<span>${esc(tool)} authorized · read-only</span></div>`;
+    }
+    const tiles = connectionsForRole(state.ob.userRole).map(conn => {
+      const selected = c.selectedTool === conn.name;
+      return `<button data-action="conn-pick" data-key="${key}" data-tool="${esc(conn.name)}" class="text-left p-3.5 rounded-xl border cursor-pointer transition-colors ${selected ? "border-violet-400 bg-violet-50/40 ring-1 ring-violet-200" : "border-zinc-200 bg-white hover:border-violet-300 hover:bg-violet-50/20"}">
+        <span class="text-xl leading-none">${conn.emoji}</span>
+        <p class="text-sm font-semibold text-zinc-900 mt-2">${esc(conn.name)}</p>
+        <p class="text-xs text-zinc-400 mt-0.5">${esc(conn.desc)}</p>
+      </button>`;
+    }).join("");
+    return `<div class="space-y-3">
+      <div class="grid grid-cols-2 gap-2">${tiles}
+        <button data-action="conn-request" data-key="${key}" class="col-span-2 text-left p-3.5 rounded-xl border border-dashed border-zinc-300 bg-zinc-50 hover:border-zinc-400 hover:bg-zinc-100 cursor-pointer transition-colors">
+          <span class="text-xl leading-none">➕</span>
+          <p class="text-sm font-semibold text-zinc-700 mt-2">Request a new connection</p>
+          <p class="text-xs text-zinc-400 mt-0.5">Don't see your source? Tell us what you need.</p>
+        </button>
+      </div>
+      ${c.selectedTool && c.phase !== "pick" ? connectionForm(c.selectedTool, key) : ""}
+    </div>`;
+  }
+
+  function sidebarAddBtn(label) {
+    return `<div class="px-2 py-1.5 text-sm text-zinc-400 flex items-center gap-1.5 opacity-40 pointer-events-none sidebar-label"><span>+</span><span>${label}</span></div>`;
   }
 
   function onboardingSidebar() {
-    const nested = (n) => `<div class="ml-4 border-l border-zinc-200 pl-2 space-y-1.5 sidebar-nested">${Array.from({ length: n }, () => obSkel("h-5", "w-[85%]")).join("")}</div>`;
     return `<div class="wb-sidebar">
       <div class="px-3 pt-3 pb-2"><div class="px-2 py-1.5 flex items-center gap-2"><span class="w-5 h-5 rounded-md bg-zinc-200 flex items-center justify-center text-xs font-bold">A</span><p class="text-sm font-bold sidebar-label">Acme org</p></div></div>
       <div class="px-3 pb-1"><div class="px-2 py-1.5 flex items-center gap-2 opacity-40 pointer-events-none"><span>🏠</span><span class="text-sm sidebar-label">Home</span></div></div>
-      <div class="px-3 pb-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2 sidebar-section-title">Goals</p>
-        <div class="px-2 mb-2 space-y-1.5">${obSkel("h-7")}${obSkel("h-7")}</div>
-        ${nested(3)}${nested(2)}
+      <div class="px-3 pb-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Goals</p>
+        ${sidebarAddBtn("New goal")}
       </div>
-      <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2 sidebar-section-title">Teammates</p>
-        <div class="px-2 space-y-1.5">${obSkel("h-8")}${obSkel("h-8")}</div>
+      <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Teammates</p>
+        ${sidebarAddBtn("Add teammate")}
       </div>
-      <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-2 sidebar-section-title">Knowledge base</p>
-        <div class="px-2 space-y-1.5">${obSkel("h-7")}${obSkel("h-7")}${obSkel("h-7")}${obSkel("h-7")}</div>
+      <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Knowledge base</p>
+        ${sidebarAddBtn("Agent asset library")}
       </div>
     </div>`;
   }
 
-  function obLayout(chat, main) {
-    return `<div class="flex h-screen bg-zinc-50 overflow-hidden font-sans min-h-0">${onboardingSidebar()}<div class="wb-split">${chat}${main}</div></div>`;
+  function obLayout(chat, main, mode) {
+    const shell = mode === "conversation"
+      ? `<div class="wb-split wb-split--conversation">${chat}</div>`
+      : mode === "context-left"
+        ? `<div class="wb-split wb-split--context wb-split--chat-left">${main}${chat}</div>`
+        : `<div class="wb-split wb-split--context">${main}${chat}</div>`;
+    return `<div class="flex h-screen bg-zinc-50 overflow-hidden font-sans min-h-0">${onboardingSidebar()}${shell}</div>`;
   }
 
   function obDatabaoChat(bodyHtml, inputHtml) {
-    return `<div class="wb-pane wb-chat-shell"><div class="wb-chat-card bg-white rounded-2xl border border-zinc-200 shadow-sm">
+    return `<div class="wb-pane wb-chat-shell"><div class="wb-chat-card wb-chat-card--flat">
       <div class="px-5 py-3.5 border-b border-zinc-200 flex items-center gap-2 shrink-0">${LOGO(20)}<button data-action="skip-onboarding" class="ml-auto text-xs text-zinc-400 hover:text-zinc-600 cursor-pointer">Skip</button></div>
       <div id="ob-chat" class="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">${bodyHtml}</div>
       ${inputHtml}
     </div></div>`;
   }
 
+  function setupProgressCompact() {
+    const items = [
+      { short: "Tasks", full: "Understand your tasks" },
+      { short: "Role", full: "Identify your role" },
+      { short: "Data", full: "Set up data access" },
+      { short: "Execute", full: "Execute first task" },
+    ];
+    function stepDone(i) {
+      if (i === 0) return !!state.ob.capability;
+      if (i === 1) return !!state.ob.userRole;
+      if (i === 2) return !!state.ob.dataSource;
+      if (i === 3) return state.ob.planConfirmed || state.ob.planStep >= 4;
+      return false;
+    }
+    function stepCurrent(i) {
+      if (stepDone(i)) return false;
+      return stepDone(i - 1) || (i === 0 && !stepDone(0));
+    }
+    const doneCount = items.filter((_, i) => stepDone(i)).length;
+    return `<div class="wb-setup-progress pb-3 mb-3 border-b border-zinc-200">
+      <div class="flex items-center justify-between mb-2.5">
+        <p class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wide">Set up progress</p>
+        <span class="text-[11px] text-zinc-400 tabular-nums">${doneCount}/${items.length}</span>
+      </div>
+      <div class="flex gap-1.5">
+        ${items.map((item, i) => {
+          const done = stepDone(i);
+          const current = stepCurrent(i);
+          return `<div class="flex-1 min-w-0" title="${esc(item.full)}">
+            <div class="h-1 rounded-full ${done ? "bg-violet-500" : current ? "bg-violet-300" : "bg-zinc-100"}"></div>
+            <div class="flex items-center gap-1 mt-1.5 min-w-0">
+              ${done ? `<span class="shrink-0 text-violet-500">${ICON.check.replace('w-4 h-4', 'w-3 h-3')}</span>` : `<span class="shrink-0 ${current ? "text-violet-400" : "text-zinc-200"}"></span>`}
+              <p class="text-[10px] truncate ${done ? "text-zinc-400 line-through" : current ? "text-violet-600 font-medium" : "text-zinc-400"}">${esc(item.short)}</p>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+  }
+
+  function artifactBody() {
+    if (state.ob.planConfirmed) {
+      const plan = buildPlan();
+      const emoji = { Florence: "👩‍💻", Ada: "🧑‍💻" }[plan.agentName] || "👩‍💻";
+      return `<div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
+        <div class="px-4 py-3 border-b border-zinc-100 flex items-center gap-2">
+          <span class="text-lg">${emoji}</span>
+          <div class="min-w-0"><p class="text-sm font-semibold text-zinc-900 truncate">${esc(plan.goal)}</p><p class="text-xs text-zinc-400">${esc(plan.agentName)} · first task running</p></div>
+          <span class="ml-auto shrink-0 text-green-600">${ICON.check}</span>
+        </div>
+        <div class="px-4 py-3">${progressBar(62)}<p class="text-xs text-zinc-400 mt-2">Pulling from ${esc(plan.source)}…</p></div>
+      </div>`;
+    }
+    if (state.ob.tasks.length > 0) {
+      return `<div class="space-y-2">
+        ${state.ob.tasks.map((t) => `<div class="border border-zinc-200 rounded-xl px-4 py-3 bg-zinc-50/40">
+          <p class="text-sm font-medium text-zinc-900">${esc(t.label)}</p>
+          <p class="text-xs text-zinc-400 mt-0.5">${esc(t.detail)}</p>
+        </div>`).join("")}
+      </div>`;
+    }
+    if (state.ob.planStep >= 2 && state.ob.capability) {
+      const plan = buildPlan();
+      const sourceMeta = connectionMeta(plan.source);
+      return `<div class="border border-zinc-200 rounded-xl overflow-hidden bg-white">
+        <div class="px-4 py-3 border-b border-zinc-100"><p class="text-xs text-zinc-400 mb-1">Draft plan</p><p class="text-sm font-semibold text-zinc-900">${esc(plan.goal)}</p></div>
+        <div class="px-4 py-3 space-y-2">
+          ${plan.tasks.map((t) => `<div class="flex items-start gap-2"><span class="text-violet-400 mt-0.5">${ICON.check.replace('w-4 h-4', 'w-3.5 h-3.5')}</span><div><p class="text-sm text-zinc-800">${esc(t.label)}</p><p class="text-xs text-zinc-400">${esc(t.detail)}</p></div></div>`).join("")}
+          <div class="flex items-center gap-2 text-xs text-zinc-500 bg-zinc-50 rounded-lg px-3 py-2 mt-2"><span>${sourceMeta.emoji}</span><span>${esc(plan.source)}</span></div>
+        </div>
+      </div>`;
+    }
+    return `<div class="wb-artifact-placeholder"><p class="text-sm text-zinc-400 text-center px-6 leading-relaxed">Artifacts from your conversation will appear here</p></div>`;
+  }
+
   function artifactPanel() {
-    const items = ["Understand your tasks", "Set up data access", "Confirm the plan"];
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
-      <h1 class="text-2xl font-bold text-zinc-900 mb-3">Set up progress</h1>
-      ${items.map((item,i)=>`<div class="flex items-center gap-2.5 mb-2"><span class="${i < state.ob.planStep ? "text-violet-500" : "text-zinc-200"}">${ICON.check}</span><p class="text-sm ${i < state.ob.planStep ? "text-zinc-300 line-through" : "text-zinc-700"}">${item}</p></div>`).join("")}
-    </div></div></div>`;
+    return `<div class="wb-pane"><div class="wb-pane-content">
+      ${setupProgressCompact()}
+      <div class="wb-artifact-area">${artifactBody()}</div>
+    </div></div>`;
   }
 
   function landingChatContent() {
+    const greeting = esc(ONBOARDING_GREETING).replace(/\n/g, "<br>");
     return `<div class="pt-1">
-      <p class="text-[15px] leading-relaxed text-zinc-800 font-semibold">Hi, I'm Databao. I'm here to help you with your golas. <br>What's on your plate?</p>
-      <p class="text-xs text-zinc-400 mt-2 mb-5">Tell it like you'd tell a colleague — type it, or just talk.</p>
+      <p class="text-[15px] leading-relaxed text-zinc-800 font-semibold">${greeting}</p>
+      <p class="text-xs text-zinc-400 mt-2 mb-5">Pick one to get started — or describe it in your own words.</p>
       <div class="flex gap-2 flex-wrap">
-        ${["📊 Watch my KPIs","📋 Take over reports","💬 Answer stakeholders"].map(s=>`<button data-action="start-chip" data-text="${esc(s.replace(/^[^\s]+\s/,""))}" class="inline-flex items-center justify-center h-8 px-3 text-xs rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 cursor-pointer leading-none">${s}</button>`).join("")}
+        ${ONBOARDING_CAPS.map((s) => `<button data-action="start-chip" data-text="${esc(s)}" class="inline-flex items-center justify-center h-8 px-3 text-sm rounded-[20px] border border-zinc-200 bg-white hover:bg-zinc-50 cursor-pointer leading-none">${esc(s)}</button>`).join("")}
       </div>
     </div>`;
   }
@@ -478,7 +1162,7 @@
   }
 
   function renderLanding() {
-    return obLayout(obDatabaoChat(landingChatContent(), landingChatFooter()), artifactPanel());
+    return obLayout(obDatabaoChat(landingChatContent(), landingChatFooter()), artifactPanel(), "context-left");
   }
 
   function renderOnboarding() {
@@ -486,10 +1170,11 @@
       const last = i === state.ob.messages.length - 1;
       if (msg.role === "user") return `<div class="flex justify-end"><div class="bg-zinc-100 rounded-[16px_16px_4px_16px] px-3.5 py-2 text-sm text-zinc-800 max-w-sm">${esc(msg.content)}</div></div>`;
       return `<div class="space-y-2.5">
-        ${msg.content ? `<p class="text-[15px] leading-relaxed text-zinc-800">${esc(msg.content)}</p>` : ""}
+        ${msg.content ? `<p class="text-[15px] leading-relaxed text-zinc-800${msg.isGreeting ? " font-semibold" : ""}">${msg.isGreeting ? esc(msg.content).replace(/\n/g, "<br>") : esc(msg.content)}</p>` : ""}
         ${msg.planCard ? planCard(msg.planCard, state.ob.planConfirmed, i) : ""}
+        ${msg.uiWidget?.type === "connectionPicker" ? connectionPicker("m"+i) : ""}
         ${msg.uiWidget?.type === "connectionForm" ? connectionForm(msg.uiWidget.tool, "m"+i) : ""}
-        ${last && !state.ob.typing && msg.suggestions ? `<div class="flex gap-2 flex-wrap">${msg.suggestions.map(s=>`<button data-action="ob-send" data-text="${esc(s)}" class="text-sm px-3.5 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-zinc-200 cursor-pointer">${esc(s)}</button>`).join("")}</div>` : ""}
+        ${last && !state.ob.typing && msg.suggestions ? `<div class="flex gap-2 flex-wrap">${msg.suggestions.map(s=>`<button data-action="ob-send" data-text="${esc(s)}" class="text-sm px-3.5 py-1.5 rounded-full border border-zinc-200 bg-white text-zinc-600 hover:border-zinc-200 cursor-pointer text-left leading-snug">${esc(s)}</button>`).join("")}</div>` : ""}
       </div>`;
     }).join("");
     const chatBody = `${msgs}${state.ob.typing ? typingDots() : ""}`;
@@ -497,18 +1182,27 @@
       ${ICON.mic}<input id="ob-input" value="${esc(state.ob.input)}" placeholder="Reply…" ${state.ob.typing?"disabled":""} class="flex-1 text-sm outline-none bg-transparent disabled:opacity-50"/>
       <button data-action="ob-send-btn" class="w-7 h-7 rounded-full flex items-center justify-center ${!state.ob.typing && state.ob.input.trim() ? "bg-violet-500 cursor-pointer" : "bg-zinc-100"}">${ICON.arrow}</button>
     </div></div>`;
-    return obLayout(obDatabaoChat(chatBody, chatInput), artifactPanel());
+    return obLayout(obDatabaoChat(chatBody, chatInput), artifactPanel(), "context-left");
   }
 
-  function chatPanel(id, title, logo, messages, typing, input, placeholder, emptyHtml) {
+  function chatPanel(id, title, logo, messages, typing, input, placeholder, emptyHtml, opts) {
+    const collapsible = opts && opts.collapsible;
+    const showBack = opts && opts.showBack;
+    const backBtn = showBack
+      ? `<button data-action="exit-chat-focus" class="text-xs text-zinc-400 hover:text-zinc-600 cursor-pointer">← Back</button>`
+      : "";
+    const collapseBtn = collapsible
+      ? `<button data-action="toggle-chat" class="ml-auto text-xs text-zinc-400 hover:text-zinc-600 cursor-pointer" title="Hide chat">Hide</button>`
+      : "";
     const body = messages.length === 0 ? emptyHtml : messages.map(m =>
       m.role === "user"
-        ? `<div class="flex justify-end"><div class="bg-zinc-100 rounded-[16px_16px_4px_16px] px-3.5 py-2 text-sm max-w-[300px]">${esc(m.content)}</div></div>`
+        ? `<div class="flex justify-end"><div class="bg-zinc-100 rounded-[16px_16px_4px_16px] px-3.5 py-2 text-sm max-w-[300px]">${m.context && m.context.length ? `<div class="flex flex-wrap gap-1 mb-1.5">${m.context.map(t => `<span class="text-[10px] bg-violet-100 text-violet-600 rounded px-1.5 py-0.5">${esc(t.length > 40 ? t.slice(0, 37) + "…" : t)}</span>`).join("")}</div>` : ""}${esc(m.content)}</div></div>`
         : `<p class="text-[15px] leading-relaxed text-zinc-800">${esc(m.content)}</p>`
     ).join("");
-    return `<div class="wb-pane wb-chat-shell"><div class="wb-chat-card bg-white rounded-2xl border border-zinc-200 shadow-sm">
-      <div class="px-5 py-3.5 border-b border-zinc-200 flex items-center gap-2 shrink-0">${logo}</div>
+    return `<div class="wb-pane wb-chat-shell"><div class="wb-chat-card wb-chat-card--flat">
+      <div class="px-5 py-3.5 border-b border-zinc-200 flex items-center gap-2 shrink-0">${backBtn}${logo}${collapseBtn}</div>
       <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">${body}${typing ? `<div class="flex items-center gap-1 pl-7">${[0,1,2].map(()=>`<div class="w-1.5 h-1.5 rounded-full bg-zinc-300 dot"></div>`).join("")}</div>` : ""}</div>
+      ${chatContextBar()}
       <div class="px-5 py-4 shrink-0"><div class="border border-zinc-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5">
         <input id="${id}-input" value="${esc(input)}" placeholder="${esc(placeholder)}" ${typing?"disabled":""} class="flex-1 text-sm outline-none bg-transparent"/>
         <button data-action="${id}-send" class="w-7 h-7 rounded-full flex items-center justify-center ${!typing && input.trim() ? "bg-violet-500 cursor-pointer" : "bg-zinc-100"}">${ICON.arrow}</button>
@@ -519,19 +1213,24 @@
   function renderHome() {
     const hour = new Date().getHours();
     const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    const userGoal = userGoalMeta();
     const needs = NEEDS_YOU.map((item, i) => state.wb.doneNeeds.includes(i) ? "" :
       `<div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-4 flex items-start gap-3"><span class="text-lg">${item.emoji}</span><div class="flex-1"><p class="text-sm text-zinc-700 mb-2.5"><span class="font-semibold">${item.agent}</span> · ${item.text}</p>
       <div class="flex gap-2"><button data-action="dismiss-need" data-i="${i}" class="h-8 px-4 rounded-lg bg-violet-500 text-white text-xs font-semibold cursor-pointer">${item.action}</button>
       <button data-action="dismiss-need" data-i="${i}" class="h-8 px-4 rounded-lg border border-zinc-200 text-zinc-500 text-xs cursor-pointer">Dismiss</button></div></div></div>`).join("");
+    const goalCards = userGoal
+      ? `<button data-action="open-doc" data-doc="kpi-monitoring" class="text-left bg-white rounded-2xl border border-violet-200 shadow-sm p-5 hover:border-violet-300 cursor-pointer ring-1 ring-violet-100"><span class="text-xl">🎯</span><p class="text-sm font-bold mt-3">${esc(userGoal.title)}</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} ${esc(userGoal.blurb)}</p></button>
+        <button data-action="open-doc" data-doc="pipeline-health" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🛡️</span><p class="text-sm font-bold mt-3">Reliable pipelines</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Auto-fixed freshness breach</p></button>`
+      : `<button data-action="open-doc" data-doc="kpi-weekly" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🎯</span><p class="text-sm font-bold mt-3">Keep KPIs healthy</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Flagged Day-7 retention drop</p></button>
+        <button data-action="open-doc" data-doc="pipeline-health" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🛡️</span><p class="text-sm font-bold mt-3">Reliable pipelines</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Auto-fixed freshness breach</p></button>`;
     return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-4xl mx-auto">
       <h1 class="text-2xl font-bold text-zinc-900 mb-1">${greeting}, Sam 👋</h1>
-      <p class="text-sm text-zinc-400 mb-8">Here's what your team handled while you were away.</p>
+      <p class="text-sm text-zinc-400 mb-8">${userGoal ? `Your "${esc(userGoal.goal)}" goal is live — here's what your team handled while you were away.` : "Here's what your team handled while you were away."}</p>
       ${state.wb.doneNeeds.length < NEEDS_YOU.length ? `<div class="mb-8"><div class="flex items-center gap-2 mb-3"><h2 class="text-sm font-semibold">Waiting on you</h2></div><div class="space-y-2.5">${needs}</div></div>` : ""}
       <h2 class="text-sm font-semibold mb-3">Your goals</h2>
-      <div class="grid grid-cols-2 gap-3 mb-8">
-        <button data-action="open-doc" data-doc="kpi-weekly" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🎯</span><p class="text-sm font-bold mt-3">Keep KPIs healthy</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Flagged Day-7 retention drop</p></button>
-        <button data-action="open-doc" data-doc="pipeline-health" class="text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer"><span class="text-xl">🛡️</span><p class="text-sm font-bold mt-3">Reliable pipelines</p><p class="text-xs text-zinc-500 mt-3 flex gap-1">${ICON.sparkles} Auto-fixed freshness breach</p></button>
-      </div>
+      <div class="grid grid-cols-2 gap-3 mb-8">${goalCards}</div>
+      <div class="flex items-center justify-between mb-3"><h2 class="text-sm font-semibold">Library · agent-produced assets</h2><button data-action="open-wiki" data-wiki="team-library" class="text-xs text-violet-600 hover:text-violet-700 cursor-pointer">View all</button></div>
+      <div class="grid grid-cols-2 gap-3 mb-8">${Object.values(KB_ASSETS).slice(0, 4).map(a => assetCard(a, true)).join("")}</div>
       <div class="flex items-center gap-2 mb-3"><h2 class="text-sm font-semibold">This week your team</h2></div>
       <div class="grid grid-cols-2 gap-3">${[["5","co-workers at work"],["58","tasks done today"],["~1.9 FTE","capacity added"],["~6h","time saved"]].map(([n,l])=>`<div class="bg-white rounded-2xl border p-5"><p class="text-2xl font-bold">${n}</p><p class="text-xs text-zinc-400">${l}</p></div>`).join("")}</div>
     </div></div></div>`;
@@ -540,24 +1239,45 @@
   function renderDoc() {
     const d = DOC_CONTENT[state.wb.openDoc] || DOC_CONTENT["kpi-weekly"];
     const emoji = AGENTS[d.agent]?.emoji || "👩‍💻";
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+    const asset = assetForDoc(state.wb.openDoc);
+    const assetBanner = asset
+      ? `<div class="flex flex-wrap items-center gap-2 mb-4 pb-4 border-b border-zinc-100">
+          <span class="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">${esc(assetTypeMeta(asset.type).label)}</span>
+          <span class="text-xs text-zinc-400">·</span>
+          <span class="text-xs text-zinc-500">Produced by ${esc(asset.agent)}</span>
+          <span class="text-xs text-violet-600 bg-violet-50 rounded-full px-2 py-0.5 ml-auto">Shared library · any agent can iterate</span>
+        </div>`
+      : "";
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl overflow-y-auto min-h-0 flex-1">
+      ${assetBanner}
       <div class="flex items-start justify-between mb-1"><h1 class="text-2xl font-bold text-zinc-900">${esc(d.title)}</h1><div class="flex items-center gap-1.5 text-xs text-zinc-400">${ICON.clock}<span>Updated ${esc(d.updated)} by ${esc(d.agent)}</span></div></div>
-      <p class="text-sm text-zinc-400 mb-8">${esc(d.subtitle)}</p>
+      <p class="text-[11px] text-zinc-400 mb-3">Click any section to add it as chat context</p>
+      <p class="text-sm text-zinc-400 mb-8 rounded-lg px-1 -mx-1${ctxActive(d.subtitle)}" ${ctxAction(d.subtitle)}>${esc(d.subtitle)}</p>
       <div class="bg-zinc-50/[0.01] border border-zinc-200 rounded-2xl p-5 mb-8"><div class="flex items-center gap-2 mb-4"><span>${emoji}</span><h2 class="text-xs font-semibold text-zinc-400 uppercase tracking-widest">While you were away, ${esc(d.agent)}:</h2></div>
-      ${d.feed.map(c=>`<div class="flex items-start gap-2.5 mb-2"><span class="text-violet-400 mt-0.5">${ICON.check.replace('w-4','w-3.5')}</span><p class="text-sm text-zinc-600 flex-1">${esc(c.action)}</p><p class="text-xs text-zinc-300">${esc(c.time)}</p></div>`).join("")}</div>
-      <h2 class="text-base font-bold mb-3">Summary</h2><p class="text-sm text-zinc-600 leading-relaxed mb-8">${esc(d.summary)}</p>
-      <div class="grid grid-cols-2 gap-3 mb-6">${d.metrics.map(k=>`<div class="rounded-xl border p-4 ${k.flagged?"border-zinc-200 bg-red-50/40":"border-zinc-200"}"><p class="text-xs text-zinc-400 mb-1">${esc(k.metric)}</p><div class="flex items-end justify-between"><div><p class="text-xl font-bold">${esc(k.value)}</p><p class="text-xs ${k.dir==="up"?"text-green-500":"text-red-400"}">${esc(k.change)}</p></div>${sparkline(k.spark, k.dir!=="up")}</div></div>`).join("")}</div>
-      <div class="bg-violet-50/70 border border-violet-200 rounded-xl px-4 py-3 mb-8">${ICON.sparkles}<p class="text-xs font-semibold text-violet-500 mt-1">${esc(d.agent)} noticed</p><p class="text-sm text-zinc-700 mt-1">${esc(d.annotation.text)}</p></div>
-      <h2 class="text-base font-bold mb-3">What ${esc(d.agent)} is watching</h2>${d.watching.map(w=>`<div class="flex items-start gap-2.5 mb-2"><span class="text-violet-400">${ICON.check}</span><p class="text-sm text-zinc-600">${esc(w)}</p></div>`).join("")}
+      ${d.feed.map(c=>{const t=`${d.agent}: ${c.action}`;return `<div class="flex items-start gap-2.5 mb-2 rounded-lg px-1 -mx-1${ctxActive(t)}" ${ctxAction(t)}><span class="text-violet-400 mt-0.5">${ICON.check.replace('w-4','w-3.5')}</span><p class="text-sm text-zinc-600 flex-1">${esc(c.action)}</p><p class="text-xs text-zinc-300">${esc(c.time)}</p></div>`;}).join("")}</div>
+      <h2 class="text-base font-bold mb-3">Summary</h2><p class="text-sm text-zinc-600 leading-relaxed mb-8 rounded-lg px-1 -mx-1${ctxActive(d.summary)}" ${ctxAction(d.summary)}>${esc(d.summary)}</p>
+      <div class="grid grid-cols-2 gap-3 mb-6">${d.metrics.map(k=>{const t=`${k.metric}: ${k.value} (${k.change})`;return `<div class="rounded-xl border p-4 ${k.flagged?"border-zinc-200 bg-red-50/40":"border-zinc-200"}${ctxActive(t)}" ${ctxAction(t)}><p class="text-xs text-zinc-400 mb-1">${esc(k.metric)}</p><div class="flex items-end justify-between"><div><p class="text-xl font-bold">${esc(k.value)}</p><p class="text-xs ${k.dir==="up"?"text-green-500":"text-red-400"}">${esc(k.change)}</p></div>${sparkline(k.spark, k.dir!=="up")}</div></div>`;}).join("")}</div>
+      <div class="bg-violet-50/70 border border-violet-200 rounded-xl px-4 py-3 mb-8${ctxActive(d.annotation.text)}" ${ctxAction(d.annotation.text)}>${ICON.sparkles}<p class="text-xs font-semibold text-violet-500 mt-1">${esc(d.agent)} noticed</p><p class="text-sm text-zinc-700 mt-1">${esc(d.annotation.text)}</p></div>
+      <h2 class="text-base font-bold mb-3">What ${esc(d.agent)} is watching</h2>${d.watching.map(w=>`<div class="flex items-start gap-2.5 mb-2 rounded-lg px-1 -mx-1${ctxActive(w)}" ${ctxAction(w)}><span class="text-violet-400">${ICON.check}</span><p class="text-sm text-zinc-600">${esc(w)}</p></div>`).join("")}
     </div></div></div>`;
   }
 
   function renderWiki() {
-    const pg = WIKI_PAGES.find(p => p.id === state.wb.openWiki) || WIKI_PAGES[0];
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
-      <h1 class="text-2xl font-bold mb-6"><span>${pg.icon}</span> ${esc(pg.title)}</h1>
-      <p class="text-sm text-zinc-600 leading-relaxed">This wiki is the long-term memory for the Growth Analytics project — a living runbook maintained by agents and the data team.</p>
-      ${pg.id === "overview" ? `<p class="text-sm text-zinc-600 mt-4">Agents check the semantic layer, conventions, and entity relationships before taking action. Proposed changes are reviewed before merging.</p>` : `<div class="text-sm text-zinc-400 py-12 text-center border border-dashed border-zinc-200 rounded-2xl mt-6">${esc(pg.title)} · content maintained by the fleet</div>`}
+    const folder = KB_FOLDERS.find(f => f.id === state.wb.openWiki) || KB_FOLDERS[0];
+    if (!folder) {
+      return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl">
+        <p class="text-sm text-zinc-400 py-12 text-center">Agents will publish reports, dashboards, and trackers here.</p>
+      </div></div></div>`;
+    }
+    const assets = folderAssets(folder.id);
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="max-w-3xl overflow-y-auto min-h-0 flex-1">
+      <h1 class="text-2xl font-bold mb-2"><span>${folder.icon}</span> ${esc(folder.title)}</h1>
+      ${folder.goal ? `<p class="text-xs text-violet-600 bg-violet-50 inline-block rounded-full px-2.5 py-0.5 mb-3">Goal: ${esc(folder.goal)}</p>` : ""}
+      <p class="text-sm text-zinc-600 leading-relaxed">${esc(folder.intro || "Agent-produced assets — shared across the fleet.")}</p>
+      <p class="text-[11px] text-zinc-400 mt-3 mb-6">Databao manages your agents and the library they write to. Any agent can open prior work and iterate.</p>
+      ${assets.length
+        ? `<div class="grid grid-cols-2 gap-3">${assets.map(a => assetCard(a)).join("")}</div>`
+        : `<div class="text-sm text-zinc-400 py-12 text-center border border-dashed border-zinc-200 rounded-2xl mt-2">No assets yet — they'll appear here as agents produce work.</div>`}
     </div></div></div>`;
   }
 
@@ -595,7 +1315,7 @@
         ${active
           ? `<button data-action="open-agent" data-agent="${esc(name)}" class="flex-1 h-9 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-xs font-semibold cursor-pointer">Open</button>`
           : `<button data-action="switch-profile" data-agent="${esc(name)}" class="flex-1 h-9 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold cursor-pointer">Switch to</button>`}
-        <button data-action="open-agent" data-agent="${esc(name)}" class="h-9 px-3 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 text-xs cursor-pointer">Configure</button>
+        <button data-action="open-agent" data-agent="${esc(name)}" data-tab="config" class="h-9 px-3 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 text-xs cursor-pointer">Configure</button>
       </div>
     </div>`;
   }
@@ -648,9 +1368,14 @@
       <div class="grid grid-cols-2 gap-3 mb-8">
         ${names.map(name => profileCard(name, PROFILES[name], name === w.activeProfile)).join("")}
       </div>
+      <div class="bg-violet-50/70 border border-violet-200 rounded-xl px-4 py-3.5 mb-8">
+        <p class="text-sm font-semibold text-zinc-800 mb-1">Create new agent types with Databao</p>
+        <p class="text-xs text-zinc-600 leading-relaxed mb-3">Open the chat panel and describe the role — Databao drafts persona, skills, tools, and gateway config. Then refine on each agent's Configuration page, or let the agent configure itself in chat.</p>
+        <button data-action="db-quick" data-text="Create a marketing analytics agent" class="text-xs px-3 py-1.5 rounded-lg bg-violet-500 hover:bg-violet-600 text-white font-semibold cursor-pointer">Try: Create a marketing analytics agent</button>
+      </div>
       <h2 class="text-sm font-semibold mb-3">How profiles work</h2>
       <div class="grid grid-cols-3 gap-3">
-        ${[["🧠","Persona","Each profile has a SOUL — role, tone, and what they own."],["⚙️","Configuration","Provider, model, data sources, and integrations per profile."],["💬","Sessions","Chat history is isolated. Switch profiles without losing context."]].map(([icon,title,desc])=>`<div class="rounded-xl border border-zinc-200 p-4"><span class="text-lg">${icon}</span><p class="text-sm font-semibold mt-2">${title}</p><p class="text-xs text-zinc-400 mt-1 leading-relaxed">${desc}</p></div>`).join("")}
+        ${[["🧠","Persona","Each profile has a SOUL — role, tone, and what they own."],["⚙️","Configuration","Skills, subagents, provider, and integrations per agent."],["💬","Self-configure","Agents can update their own skills and spawn subagents via chat."]].map(([icon,title,desc])=>`<div class="rounded-xl border border-zinc-200 p-4"><span class="text-lg">${icon}</span><p class="text-sm font-semibold mt-2">${title}</p><p class="text-xs text-zinc-400 mt-1 leading-relaxed">${desc}</p></div>`).join("")}
       </div>
     </div></div>${w.showCreateProfile ? createProfileModal() : ""}</div>`;
   }
@@ -734,6 +1459,190 @@
     return actions.sort((a, b) => parseMockTime(a.time) - parseMockTime(b.time));
   }
 
+  function agentConfigQuickButtons(name) {
+    const qs = [
+      `Add a skill for stakeholder reporting`,
+      `Create a subagent to watch #data-alerts`,
+      `Make your tone more concise for executives`,
+    ];
+    return qs.map(q => `<button data-action="ask-quick" data-text="${esc(q)}" class="w-full text-left text-sm px-3.5 py-2.5 rounded-xl border border-zinc-200 mb-2 cursor-pointer hover:border-violet-300">${esc(q)}</button>`).join("");
+  }
+
+  function mockAgentConfig(name, q) {
+    const a = PROFILES[name];
+    if (!a) return "I couldn't find this profile.";
+    const s = q.toLowerCase();
+    if (!a.persona) a.persona = { skills: [], tone: "", responsibilities: [], boundaries: "", tools: [] };
+    if (!a.persona.skills) a.persona.skills = [];
+    if (!a.subagents) a.subagents = [];
+
+    if (/subagent|spawn|delegate/.test(s)) {
+      let role = "Handles a scoped monitoring task";
+      if (s.includes("slack") || s.includes("alert")) role = "Watches #data-alerts and drafts responses";
+      else if (s.includes("cohort") || s.includes("retention")) role = "Runs daily cohort checks";
+      else if (s.includes("fresh") || s.includes("pipeline")) role = "Monitors pipeline freshness";
+      const subName = s.includes("slack") ? "Alert Monitor" : s.includes("cohort") ? "Cohort Runner" : s.includes("fresh") ? "Freshness Scout" : "Task Runner";
+      a.subagents.push({ name: subName, emoji: "🛰️", role, status: "online" });
+      return `Done — I spawned subagent "${subName}" (${role}). You'll see it under Subagents on my configuration page.`;
+    }
+    if (/skill|add.*for|expertise/.test(s)) {
+      let skillName = "Custom analysis";
+      let desc = "Added via chat configuration.";
+      if (s.includes("stakeholder") || s.includes("report")) { skillName = "Stakeholder reporting"; desc = "Drafts executive-ready summaries and alert copy."; }
+      else if (s.includes("cohort")) { skillName = "Cohort analysis"; desc = "Compares retention curves across product changes."; }
+      else if (s.includes("forecast")) { skillName = "Forecasting"; desc = "Builds scenario models from historical series."; }
+      else {
+        const m = q.match(/skill for (.+)/i) || q.match(/add (?:a )?(.+)/i);
+        if (m) { skillName = m[1].trim().replace(/\.$/, ""); desc = `Covers ${skillName.toLowerCase()} for this team.`; }
+      }
+      if (!a.persona.skills.some(sk => sk.name.toLowerCase() === skillName.toLowerCase())) {
+        a.persona.skills.push({ name: skillName, level: "Developing", desc });
+      }
+      return `Added skill "${skillName}" to my profile. I can refine the description if you want more specificity.`;
+    }
+    if (/tone|concise|communication|style/.test(s)) {
+      a.persona.tone = s.includes("concise")
+        ? "Brief and executive-ready — leads with the headline, one supporting chart, then recommendation."
+        : "Clear and direct — leads with the number, then context.";
+      return "Updated my communication style. I'll apply it in reports and chat going forward.";
+    }
+    if (/config|skill|subagent/.test(s)) {
+      return `You can edit my skills and subagents on the Configuration tab — or just tell me what to add here in chat.`;
+    }
+    return name === "Ada" ? mockAda(q) : mockFlorence(q);
+  }
+
+  function tryCreateAgentTypeFromDb(text) {
+    const s = text.toLowerCase();
+    const patterns = [
+      /create(?: a)?(?: new)? (.+?) agent/i,
+      /new agent type for (.+)/i,
+      /add (?:a )?(.+?) teammate/i,
+      /spin up (?:a )?(.+?) agent/i,
+    ];
+    let role = "";
+    for (const p of patterns) {
+      const m = text.match(p);
+      if (m) { role = m[1].trim().replace(/\.$/, ""); break; }
+    }
+    if (!role && (s.includes("agent type") || s.includes("new agent"))) return { drafted: true, role: "" };
+    if (!role) return null;
+    const name = role.split(/\s+/).map(w => w[0]?.toUpperCase() + w.slice(1)).join(" ").replace(/ analytics$/i, "").trim() || "Morgan";
+    if (PROFILES[name]) return { exists: true, name };
+    const port = 8642 + Object.keys(PROFILES).length;
+    PROFILES[name] = {
+      emoji: "🤖", role: role.charAt(0).toUpperCase() + role.slice(1), docs: [], tasks: 0,
+      soul: `Owns ${role} — configured by Databao from your description.`,
+      tags: [role],
+      persona: {
+        tone: "Professional and helpful — adapts to your team's communication style.",
+        skills: [{ name: role, level: "Developing", desc: `Primary focus: ${role}.` }],
+        responsibilities: [`Monitor and report on ${role}`],
+        boundaries: "Escalates outside scope to the appropriate teammate.",
+        tools: ["Snowflake"],
+      },
+      subagents: [],
+      status: "online", gateway: port, sessions: 0, isDefault: false,
+      config: { provider: "Anthropic", model: "claude-sonnet-4", sources: ["Snowflake"], integrations: [] },
+    };
+    state.wb.profileSessions[name] = [];
+    return { created: true, name, role };
+  }
+
+  function renderAgentConfigTab(name, a) {
+    const w = state.wb;
+    const skills = a.persona?.skills || [];
+    const subagents = a.subagents || [];
+    const ns = w.newSkill;
+    const nsub = w.newSubagent;
+
+    const skillsList = skills.map((sk, i) => `<div class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white p-4">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1">
+          <p class="text-sm font-semibold text-zinc-900">${esc(sk.name)}</p>
+          <span class="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full border ${skillLevelClass(sk.level)}">${esc(sk.level || "Developing")}</span>
+        </div>
+        <p class="text-xs text-zinc-500 leading-relaxed">${esc(sk.desc)}</p>
+      </div>
+      <button data-action="remove-skill" data-i="${i}" class="text-xs text-zinc-400 hover:text-red-500 cursor-pointer shrink-0">Remove</button>
+    </div>`).join("");
+
+    const subagentList = subagents.map((sub, i) => `<div class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white p-4">
+      <span class="text-xl">${sub.emoji}</span>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-0.5">
+          <p class="text-sm font-semibold text-zinc-900">${esc(sub.name)}</p>
+          <span class="text-[10px] px-2 py-0.5 rounded-full ${sub.status === "online" ? "bg-green-50 text-green-700" : "bg-zinc-100 text-zinc-500"}">${sub.status === "online" ? "Online" : "Idle"}</span>
+        </div>
+        <p class="text-xs text-zinc-500">${esc(sub.role)}</p>
+      </div>
+      <button data-action="remove-subagent" data-i="${i}" class="text-xs text-zinc-400 hover:text-red-500 cursor-pointer shrink-0">Remove</button>
+    </div>`).join("");
+
+    const addSkillForm = w.showAddSkill ? `<div class="rounded-xl border border-violet-200 bg-violet-50/40 p-4 mb-3 space-y-2">
+      <input data-action="skill-field" data-field="name" value="${esc(ns.name)}" placeholder="Skill name" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none bg-white"/>
+      <input data-action="skill-field" data-field="desc" value="${esc(ns.desc)}" placeholder="What this skill covers" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none bg-white"/>
+      <select data-action="skill-field" data-field="level" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none bg-white">
+        ${["Developing", "Advanced", "Expert"].map(l => `<option ${ns.level === l ? "selected" : ""}>${l}</option>`).join("")}
+      </select>
+      <div class="flex gap-2">
+        <button data-action="save-skill" class="flex-1 h-9 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-xs font-semibold cursor-pointer">Save skill</button>
+        <button data-action="cancel-add-skill" class="h-9 px-3 rounded-lg border border-zinc-200 text-zinc-600 text-xs cursor-pointer">Cancel</button>
+      </div>
+    </div>` : "";
+
+    const addSubForm = w.showAddSubagent ? `<div class="rounded-xl border border-violet-200 bg-violet-50/40 p-4 mb-3 space-y-2">
+      <div class="flex gap-2">
+        <input data-action="subagent-field" data-field="emoji" value="${esc(nsub.emoji)}" class="w-14 h-9 px-2 text-center text-lg border border-zinc-200 rounded-lg outline-none bg-white"/>
+        <input data-action="subagent-field" data-field="name" value="${esc(nsub.name)}" placeholder="Subagent name" class="flex-1 h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none bg-white"/>
+      </div>
+      <input data-action="subagent-field" data-field="role" value="${esc(nsub.role)}" placeholder="What it owns (e.g. watches Slack alerts)" class="w-full h-9 px-3 text-sm border border-zinc-200 rounded-lg outline-none bg-white"/>
+      <div class="flex gap-2">
+        <button data-action="save-subagent" class="flex-1 h-9 rounded-lg bg-violet-500 hover:bg-violet-600 text-white text-xs font-semibold cursor-pointer">Create subagent</button>
+        <button data-action="cancel-add-subagent" class="h-9 px-3 rounded-lg border border-zinc-200 text-zinc-600 text-xs cursor-pointer">Cancel</button>
+      </div>
+    </div>` : "";
+
+    return `<div class="space-y-6">
+      <div class="bg-violet-50/70 border border-violet-200 rounded-xl px-4 py-3.5">
+        <p class="text-sm font-semibold text-zinc-800 mb-1">Configure ${esc(name)} — manually or via chat</p>
+        <p class="text-xs text-zinc-600 leading-relaxed">Edit skills and subagents below, or ask ${esc(name)} in the chat panel to update its own configuration. ${esc(name)} can add skills, spawn subagents, and refine its persona for you.</p>
+        <p class="text-xs text-zinc-500 mt-2">Need a wholly new agent type? Ask <span class="font-medium">Databao</span> from Teammate profiles to draft one.</p>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold">Skills</h2>
+          <button data-action="toggle-add-skill" class="text-xs text-violet-600 hover:text-violet-700 cursor-pointer font-medium">+ Add skill</button>
+        </div>
+        ${addSkillForm}
+        <div class="space-y-2">${skillsList || `<p class="text-xs text-zinc-400 py-4 text-center border border-dashed border-zinc-200 rounded-xl">No skills yet — add one or ask ${esc(name)} in chat.</p>`}</div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold">Subagents</h2>
+          <button data-action="toggle-add-subagent" class="text-xs text-violet-600 hover:text-violet-700 cursor-pointer font-medium">+ Create subagent</button>
+        </div>
+        <p class="text-xs text-zinc-400 mb-3">Specialized workers ${esc(name)} can delegate to — each with its own scope and status.</p>
+        ${addSubForm}
+        <div class="space-y-2">${subagentList || `<p class="text-xs text-zinc-400 py-4 text-center border border-dashed border-zinc-200 rounded-xl">No subagents yet — create one or ask ${esc(name)} to spawn one in chat.</p>`}</div>
+      </div>
+
+      <div>
+        <h2 class="text-sm font-semibold mb-3">Runtime</h2>
+        <div class="bg-white border border-zinc-200 rounded-2xl px-5 py-1">
+          ${profileConfigRow("Provider", a.config.provider)}
+          ${profileConfigRow("Model", a.config.model)}
+          ${profileConfigRow("Data sources", a.config.sources.join(", "))}
+          ${profileConfigRow("Integrations", a.config.integrations.join(", ") || "—")}
+          ${profileConfigRow("Gateway", "127.0.0.1:" + a.gateway)}
+          ${profileConfigRow("Profile path", "profiles/" + name.toLowerCase())}
+        </div>
+      </div>
+    </div>`;
+  }
+
   function profileRecentActionsBlock(name) {
     const actions = getAgentRecentActions(name).slice(0, 6);
     return `<div class="flex items-center justify-between mb-3 pt-4">
@@ -754,20 +1663,17 @@
     const tabBar = tabs.map(([id,label])=>`<button data-action="profile-tab" data-tab="${id}" class="px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${tab===id?"bg-zinc-200/80 text-zinc-900":"text-zinc-500 hover:bg-zinc-100"}">${label}</button>`).join("");
     let body = "";
     if (tab === "overview") {
-      body = `<h2 class="text-sm font-semibold mb-3">Documents ${esc(name)} maintains</h2>
+      const produced = Object.values(KB_ASSETS).filter(a => a.agent === name);
+      body = `<h2 class="text-sm font-semibold mb-3">Assets ${esc(name)} produced</h2>
+      ${produced.length ? `<div class="grid grid-cols-2 gap-2 mb-6">${produced.map(a => assetCard(a, true)).join("")}</div>` : `<p class="text-xs text-zinc-400 mb-6">No library assets yet.</p>`}
+      <p class="text-xs text-zinc-400 mb-4">${esc(name)} can also read and iterate on assets from other agents in the shared library.</p>
+      <h2 class="text-sm font-semibold mb-3">Documents ${esc(name)} maintains</h2>
       ${a.docs.map(id=>{const doc=DOCUMENTS.find(d=>d.id===id);return doc?`<button data-action="open-doc" data-doc="${id}" class="w-full text-left bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-zinc-200 cursor-pointer mb-2"><p class="text-sm font-bold">${esc(doc.title)}</p><p class="text-xs text-zinc-400 mt-1">Updated ${esc(doc.freshness)}</p></button>`:"";}).join("")}
       ${profileRecentActionsBlock(name)}`;
     } else if (tab === "persona") {
       body = renderPersonaTab(a);
     } else if (tab === "config") {
-      body = `<div class="bg-white border border-zinc-200 rounded-2xl px-5 py-1 mb-4">
-        ${profileConfigRow("Provider", a.config.provider)}
-        ${profileConfigRow("Model", a.config.model)}
-        ${profileConfigRow("Data sources", a.config.sources.join(", "))}
-        ${profileConfigRow("Integrations", a.config.integrations.join(", "))}
-        ${profileConfigRow("Gateway", "127.0.0.1:" + a.gateway)}
-        ${profileConfigRow("Profile path", "profiles/" + name.toLowerCase())}
-      </div>`;
+      body = renderAgentConfigTab(name, a);
     } else {
       const msgs = w.profileSessions[name] || w.askMessages || [];
       body = msgs.length === 0
@@ -787,24 +1693,62 @@
     </div></div></div>`;
   }
 
+  function sidebarAssetForDoc(docId) {
+    if (docId === "kpi-monitoring") return null;
+    return assetForDoc(docId)?.id || null;
+  }
+
+  function sidebarSelection(w) {
+    if (w.view === "home") return { type: "home" };
+    if (w.view === "wiki") return { type: "wiki", id: w.openWiki };
+    if (w.view === "agent") return { type: "agent", id: w.openAgent };
+    if (w.view === "profiles") return { type: "profiles" };
+    if (w.view === "doc") {
+      if (w.openAsset) return { type: "asset", id: w.openAsset };
+      return { type: "doc", id: w.openDoc };
+    }
+    return null;
+  }
+  function sidebarNavActive(sel, type, id) {
+    if (!sel || sel.type !== type) return false;
+    return id === undefined || sel.id === id;
+  }
+  function sidebarNavClass(active) {
+    return active ? "bg-zinc-200/60 font-medium text-zinc-900" : "";
+  }
+  function sidebarTimeMeta(active, time) {
+    return active && time ? `<span class="text-[10px] text-zinc-400 shrink-0 tabular-nums sidebar-label">${esc(time)}</span>` : "";
+  }
+
   function sidebar() {
     const w = state.wb;
-    const docBtn = (doc) => `<button data-action="open-doc" data-doc="${doc.id}" class="w-full text-left px-2 py-1 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="doc"&&w.openDoc===doc.id?"bg-zinc-200/60 font-medium text-zinc-900":"text-zinc-500 hover:bg-zinc-100"}">${ICON.file}<span class="text-[13px] truncate sidebar-label">${esc(doc.title)}</span></button>`;
+    const sel = sidebarSelection(w);
+    const userGoal = userGoalMeta();
+    const goalDoc = DOCUMENTS.find(d => d.id === "kpi-monitoring");
+    const goalActive = sidebarNavActive(sel, "doc", "kpi-monitoring");
+    const goalLabel = userGoal ? (goalDoc?.title || userGoal.goal) : "Keep KPIs healthy";
+    const goalTime = goalDoc?.freshness || "just now";
+
     return `<div class="wb-sidebar">
       <div class="px-3 pt-3 pb-2"><div class="px-2 py-1.5 flex items-center gap-2"><span class="w-5 h-5 rounded-md bg-zinc-200 flex items-center justify-center text-xs font-bold">A</span><p class="text-sm font-bold sidebar-label">Acme org</p></div></div>
-      <div class="px-3 pb-1"><button data-action="go-home" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="home"?"bg-zinc-200/60 font-medium":"text-zinc-600 hover:bg-zinc-100"}"><span>🏠</span><span class="text-sm sidebar-label">Home</span></button></div>
+      <div class="px-3 pb-1"><button data-action="go-home" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${sidebarNavClass(sidebarNavActive(sel, "home"))} ${sidebarNavActive(sel, "home") ? "" : "text-zinc-600 hover:bg-zinc-100"}"><span>🏠</span><span class="text-sm sidebar-label flex-1">Home</span></button></div>
       <div class="px-3 pb-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Goals</p>
-        <div class="px-2 py-1.5 text-sm font-medium flex gap-2"><span>🎯</span><span class="truncate sidebar-label">Keep KPIs healthy</span></div>
-        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["kpi-monitoring","kpi-weekly"].includes(d.id)).map(docBtn).join("")}</div>
-        <div class="px-2 py-1.5 text-sm font-medium flex gap-2 mt-1"><span>🛡️</span><span class="truncate sidebar-label">Reliable pipelines</span></div>
-        <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested">${DOCUMENTS.filter(d=>["pipeline-health"].includes(d.id)).map(docBtn).join("")}</div>
+        <button data-action="open-doc" data-doc="kpi-monitoring" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 min-w-0 ${sidebarNavClass(goalActive)} ${goalActive ? "" : "text-zinc-600 hover:bg-zinc-100"}"><span>🎯</span><span class="text-[13px] truncate sidebar-label flex-1">${esc(goalLabel)}</span>${sidebarTimeMeta(goalActive, goalTime)}</button>
       </div>
       <div class="px-3 pb-2 mt-2"><div class="flex items-center justify-between px-2 mb-1"><p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest sidebar-section-title">Teammates</p></div>
-        ${Object.entries(PROFILES).map(([name,a])=>`<button data-action="open-agent" data-agent="${name}" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="agent"&&w.openAgent===name?"bg-zinc-200/60 font-medium":"text-zinc-700 hover:bg-zinc-100"}"><span>${a.emoji}</span><span class="text-sm sidebar-label flex-1 truncate">${name}</span></button>`).join("")}
+        ${Object.entries(PROFILES).filter(([name])=>name!=="Ada").map(([name,a])=>{const active=sidebarNavActive(sel,"agent",name);return `<button data-action="open-agent" data-agent="${name}" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 min-w-0 ${sidebarNavClass(active)} ${active?"":"text-zinc-700 hover:bg-zinc-100"}"><span>${a.emoji}</span><span class="text-sm sidebar-label flex-1 truncate">${name}</span></button>`;}).join("")}
       </div>
       <div class="px-3 pb-2 mt-2"><p class="px-2 text-[10px] font-semibold text-zinc-400 uppercase tracking-widest mb-1 sidebar-section-title">Knowledge base</p>
-        ${(w.kbExpanded?WIKI_PAGES:WIKI_PAGES.slice(0,4)).map(pg=>`<button data-action="open-wiki" data-wiki="${pg.id}" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 ${w.view==="wiki"&&w.openWiki===pg.id?"bg-zinc-200/60 font-medium":"text-zinc-600 hover:bg-zinc-100"}"><span>${pg.icon}</span><span class="text-[13px] truncate sidebar-label">${esc(pg.title)}</span></button>`).join("")}
-        <button data-action="toggle-kb" class="w-full text-left px-2 py-1.5 rounded-lg text-[13px] text-zinc-400 hover:bg-zinc-100 cursor-pointer sidebar-label">${w.kbExpanded?"Show less":(WIKI_PAGES.length-4)+" more"}</button>
+        ${KB_FOLDERS.map(folder => {
+          const assets = folderAssets(folder.id);
+          const folderActive = sidebarNavActive(sel, "wiki", folder.id);
+          return `<button data-action="open-wiki" data-wiki="${folder.id}" class="w-full text-left px-2 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 min-w-0 ${sidebarNavClass(folderActive)} ${folderActive ? "" : "text-zinc-600 hover:bg-zinc-100"}"><span>${folder.icon}</span><span class="text-[13px] truncate sidebar-label flex-1">${esc(folder.title)}</span></button>
+          <div class="ml-4 border-l border-zinc-200 pl-1 sidebar-nested mb-1">${assets.map(a => {
+            const tm = assetTypeMeta(a.type);
+            const active = sidebarNavActive(sel, "asset", a.id);
+            return `<button data-action="open-asset" data-asset="${a.id}" class="w-full text-left px-2 py-1 rounded-lg cursor-pointer flex items-center gap-2 min-w-0 ${sidebarNavClass(active)} ${active ? "" : "text-zinc-500 hover:bg-zinc-100"}"><span class="text-[11px]">${tm.icon}</span><span class="text-[12px] truncate sidebar-label flex-1">${esc(a.title)}</span>${sidebarTimeMeta(active, a.updated)}</button>`;
+          }).join("")}</div>`;
+        }).join("")}
       </div>
     </div>`;
   }
@@ -816,29 +1760,41 @@
 
     let main = "";
     let chat = "";
+    const buildingViaChat = w.chatFocused && ["home", "wiki", "profiles"].includes(w.view);
+    const chatOpts = { collapsible: !buildingViaChat, showBack: buildingViaChat };
     if (w.view === "home") {
-      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState());
+      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState(), chatOpts);
       main = renderHome();
     } else if (w.view === "wiki") {
-      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState());
+      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState(), chatOpts);
       main = renderWiki();
     } else if (w.view === "profiles") {
-      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState());
+      chat = chatPanel("db", "Databao", LOGO(20), w.dbMessages, w.dbTyping, w.dbInput, "Message Databao…", databaoEmptyState(), chatOpts);
       main = renderProfiles();
     } else if (w.view === "agent") {
-      chat = chatPanel("ask", w.openAgent, `<span class="text-lg">${AGENTS[w.openAgent]?.emoji||""}</span>`, w.askMessages, w.askTyping, w.askInput, `Message ${w.openAgent}…`,
-        `<p class="text-sm">Hi, I'm ${esc(w.openAgent)} 👋</p>`);
+      const agentName = w.openAgent;
+      const onConfig = w.profileTab === "config";
+      const askEmpty = onConfig
+        ? `<div class="text-center"><p class="text-sm pb-1 text-left">Configure ${esc(agentName)} via chat</p><p class="text-xs text-zinc-400 pb-3 text-left">${esc(agentName)} can add skills, spawn subagents, and update its persona — changes appear on the Configuration tab.</p>${agentConfigQuickButtons(agentName)}</div>`
+        : `<p class="text-sm">Hi, I'm ${esc(agentName)} 👋</p><p class="text-xs text-zinc-400 mt-2">I can read the shared library and build on assets from any agent.${onConfig ? "" : ` <button data-action="profile-tab" data-tab="config" class="text-violet-600 hover:underline cursor-pointer">Open configuration →</button>`}</p>`;
+      chat = chatPanel("ask", agentName, `<span class="text-lg">${AGENTS[agentName]?.emoji||""}</span>`, w.askMessages, w.askTyping, w.askInput, onConfig ? `Ask ${agentName} to configure itself…` : `Message ${agentName}…`, askEmpty, chatOpts);
       main = renderAgent();
     } else if (w.view === "doc") {
       const agent = DOC_CONTENT[w.openDoc]?.agent || "Florence";
-      chat = chatPanel("ask", agent, `<span class="text-lg">${AGENTS[agent]?.emoji||"👩‍💻"}</span>`, w.askMessages, w.askTyping, w.askInput, "Ask about this report…",
-        `<div class="text-center"><p class="text-sm pb-3">Hi, I'm ${esc(agent)} 👋</p>
-        ${["Show the cohort comparison","How confident are you it's the modal?","What would you do next?"].map(q=>`<button data-action="ask-quick" data-text="${esc(q)}" class="w-full text-left text-sm px-3.5 py-2.5 rounded-xl border mb-2 cursor-pointer">${q}</button>`).join("")}</div>`);
+      const quickQs = w.openDoc === "kpi-monitoring" && state.agentInfo?.goal ? docQuickQuestions() : ["Show the cohort comparison", "How confident are you it's the modal?", "What would you do next?"];
+      chat = chatPanel("ask", agent, `<span class="text-lg">${AGENTS[agent]?.emoji||"👩‍💻"}</span>`, w.askMessages, w.askTyping, w.askInput, state.agentInfo?.goal ? `Ask about ${state.agentInfo.goal}…` : "Ask about this report…",
+        `<div class="text-center"><p class="text-sm pb-3 text-left">Hi, I'm ${esc(agent)} 👋${state.agentInfo?.goal ? ` · working on <span class="font-medium">${esc(state.agentInfo.goal)}</span>` : ""}</p>
+        ${quickQs.map(q=>`<button data-action="ask-quick" data-text="${esc(q)}" class="w-full text-left text-sm px-3.5 py-2.5 rounded-xl border mb-2 cursor-pointer">${esc(q)}</button>`).join("")}</div>`, chatOpts);
       main = renderDoc();
     }
-    const split = chat
-      ? `<div class="wb-split">${chat}${main}</div>`
-      : `<div class="wb-split">${main}</div>`;
+    const chatReopen = chat && !w.askOpen && !buildingViaChat
+      ? `<button data-action="toggle-chat" class="wb-chat-reopen" title="Open chat">Chat</button>`
+      : "";
+    const split = buildingViaChat && chat
+      ? `<div class="wb-split wb-split--conversation">${chat}</div>`
+      : chat && w.askOpen
+        ? `<div class="wb-split wb-split--context">${main}${chat}</div>`
+        : `<div class="wb-split wb-split--context">${main}${chatReopen}</div>`;
     return `<div class="flex h-screen bg-zinc-50 overflow-hidden font-sans min-h-0">${sidebar()}${split}</div>`;
   }
 
@@ -861,10 +1817,19 @@
   }
 
   function startOnboarding(text) {
+    if (!text.trim()) return;
     state.ob.screen = "onboarding";
-    state.ob.messages = [{ role: "ai", content: "Hi, I'm Databao 👋 What's on your plate?", suggestions: null }];
-    state.ob.msgCount = 0; state.ob.tasks = []; state.ob.planStep = 0; state.ob.planConfirmed = false; state.ob.conn = {};
-    if (text) { state.ob.messages.push({ role: "user", content: text }); state.ob.msgCount = 1; respondScripted(text, 0); }
+    state.ob.tasks = []; state.ob.planConfirmed = false; state.ob.conn = {};
+    state.ob.wantAutomate = false; state.ob.schedule = null; state.ob.userRole = null; state.ob.achievement = null; state.ob.dataSource = null;
+    state.ob.capability = text.trim();
+    state.ob.planStep = 1;
+    state.ob.awaitingRole = true;
+    state.ob.msgCount = 0;
+    state.ob.messages = [
+      { role: "ai", content: ONBOARDING_GREETING, isGreeting: true },
+      { role: "user", content: text.trim() },
+      { role: "ai", content: "What is your role?", suggestions: USER_ROLES },
+    ];
     render();
   }
 
@@ -872,7 +1837,7 @@
     state.ob.typing = true; render();
     setTimeout(() => {
       state.ob.typing = false;
-      const step = SCRIPT[Math.min(stepIndex, SCRIPT.length - 1)];
+      const step = getScriptStep(stepIndex, userText);
       if (step.artifact?.tasks) state.ob.tasks = step.artifact.tasks;
       if (step.artifact?.planStep !== undefined) state.ob.planStep = Math.max(state.ob.planStep, step.artifact.planStep);
       state.ob.messages.push({ role: "ai", content: step.reply, suggestions: step.suggestions || null, uiWidget: step.ui ? step.ui(userText) : null, planCard: step.planCard || null });
@@ -884,6 +1849,14 @@
     if (!text.trim() || state.ob.typing) return;
     state.ob.input = "";
     state.ob.messages.push({ role: "user", content: text.trim() });
+    if (state.ob.awaitingRole) {
+      state.ob.userRole = text.trim();
+      state.ob.planStep = 2;
+      state.ob.awaitingRole = false;
+      state.ob.msgCount++;
+      respondScripted(state.ob.capability, 0);
+      return;
+    }
     const step = state.ob.msgCount;
     state.ob.msgCount++;
     respondScripted(text.trim(), step);
@@ -891,13 +1864,32 @@
 
   function confirmPlan(plan) {
     state.ob.planConfirmed = true;
-    state.ob.planStep = 3;
+    state.ob.planStep = 4;
     render();
     setTimeout(() => {
-      state.agentInfo = { agentName: plan.agentName, summary: `The "${plan.goal}" goal is live.` };
+      const userDoc = buildUserGoalDoc(plan);
+      const userFolder = setupUserGoalLibrary(plan);
+      DOC_CONTENT["kpi-monitoring"] = userDoc;
+      const docEntry = DOCUMENTS.find(d => d.id === "kpi-monitoring");
+      if (docEntry) {
+        docEntry.title = userDoc.title;
+        docEntry.agent = plan.agentName;
+      }
+      state.agentInfo = {
+        agentName: plan.agentName,
+        summary: `The "${plan.goal}" goal is live.`,
+        goal: plan.goal,
+        wikiFolder: userFolder.title,
+        capability: state.ob.capability,
+        achievement: state.ob.achievement,
+        role: state.ob.userRole,
+        source: plan.source,
+      };
       state.phase = "product";
       state.wb.view = "doc";
       state.wb.openDoc = "kpi-monitoring";
+      state.wb.openAsset = null;
+      state.wb.activeProfile = plan.agentName;
       render();
     }, 650);
   }
@@ -905,22 +1897,27 @@
   function sendChat(kind, text) {
     if (!text.trim()) return;
     const w = state.wb;
+    const context = w.chatContext.length ? w.chatContext.map(c => c.text) : null;
     if (kind === "db") {
       if (w.dbTyping) return;
       w.dbInput = "";
-      w.dbMessages.push({ role: "user", content: text.trim() });
+      w.chatContext = [];
+      if (["home", "wiki", "profiles"].includes(w.view)) { w.chatFocused = true; w.askOpen = true; }
+      w.dbMessages.push({ role: "user", content: text.trim(), context });
       w.dbTyping = true; render();
       setTimeout(() => { w.dbTyping = false; w.dbMessages.push({ role: "agent", content: mockDb(text) }); render(); }, 900);
     } else {
       if (w.askTyping) return;
       w.askInput = "";
-      w.askMessages.push({ role: "user", content: text.trim() });
+      w.chatContext = [];
+      w.askMessages.push({ role: "user", content: text.trim(), context });
       if (w.openAgent) w.profileSessions[w.openAgent] = w.askMessages;
       w.askTyping = true; render();
       const agent = w.view === "agent" ? w.openAgent : (DOC_CONTENT[w.openDoc]?.agent || "Florence");
+      const onConfig = w.view === "agent" && w.profileTab === "config";
       setTimeout(() => {
         w.askTyping = false;
-        w.askMessages.push({ role: "agent", content: agent === "Ada" ? mockAda(text) : mockFlorence(text) });
+        w.askMessages.push({ role: "agent", content: onConfig ? mockAgentConfig(agent, text) : mockAgentForGoal(agent, text) });
         if (w.openAgent) {
           w.profileSessions[w.openAgent] = w.askMessages;
           if (PROFILES[w.openAgent]) PROFILES[w.openAgent].sessions = w.askMessages.length;
@@ -943,19 +1940,68 @@
       if (a === "ob-send-btn") obSend(state.ob.input);
       if (a === "confirm-plan") confirmPlan(state.ob.messages[+el.dataset.idx].planCard);
       if (a === "edit-plan") obSend("I'd like to change something");
+      if (a === "conn-pick") {
+        const key = el.dataset.key, tool = el.dataset.tool;
+        state.ob.conn[key] = { ...(state.ob.conn[key] || {}), selectedTool: tool, phase: "input", accountId: "" };
+        render();
+      }
+      if (a === "conn-request") {
+        state.ob.messages.push(
+          { role: "user", content: "Request a new connection" },
+          { role: "ai", content: "Noted — we'll follow up on that. In the meantime, connect an existing source below to keep going." }
+        );
+        render();
+      }
       if (a === "conn-connect") {
         const key = el.dataset.key, tool = el.dataset.tool;
         const c = state.ob.conn[key] || { accountId: "" };
         if (!c.accountId.trim()) return;
-        c.phase = "redirecting"; state.ob.conn[key] = c; render();
-        setTimeout(() => { c.phase = "done"; state.ob.conn[key] = c; render(); setTimeout(() => obSend(tool + " connected"), 400); }, 1400);
+        c.phase = "redirecting"; c.selectedTool = tool; state.ob.conn[key] = c; render();
+        setTimeout(() => { c.phase = "done"; state.ob.dataSource = tool; state.ob.conn[key] = c; render(); setTimeout(() => obSend(tool + " connected"), 400); }, 1400);
       }
-      if (a === "go-home") { state.wb.view = "home"; state.wb.askMessages = []; render(); }
-      if (a === "open-doc") { state.wb.view = "doc"; state.wb.openDoc = el.dataset.doc; state.wb.askMessages = []; render(); }
-      if (a === "open-agent") { loadProfileChat(el.dataset.agent); state.wb.view = "agent"; state.wb.profileTab = "overview"; render(); }
-      if (a === "open-profiles") { state.wb.view = "profiles"; render(); }
+      if (a === "add-context") { toggleChatContext(el.dataset.contextText || ""); return; }
+      if (a === "remove-context") { state.wb.chatContext = state.wb.chatContext.filter(c => c.id !== +el.dataset.id); render(); return; }
+      if (a === "go-home") { state.wb.view = "home"; state.wb.openAsset = null; state.wb.askMessages = []; state.wb.chatContext = []; state.wb.chatFocused = false; render(); }
+      if (a === "open-doc") { state.wb.view = "doc"; state.wb.openDoc = el.dataset.doc; state.wb.openAsset = sidebarAssetForDoc(el.dataset.doc); state.wb.askMessages = []; state.wb.chatContext = []; state.wb.chatFocused = false; render(); }
+      if (a === "open-agent") { loadProfileChat(el.dataset.agent); state.wb.view = "agent"; state.wb.openAsset = null; state.wb.profileTab = el.dataset.tab || "overview"; state.wb.showAddSkill = false; state.wb.showAddSubagent = false; state.wb.chatContext = []; state.wb.chatFocused = false; render(); }
+      if (a === "open-profiles") { state.wb.view = "profiles"; state.wb.openAsset = null; state.wb.chatContext = []; state.wb.chatFocused = false; render(); }
       if (a === "switch-profile") { loadProfileChat(el.dataset.agent); render(); }
-      if (a === "profile-tab") { state.wb.profileTab = el.dataset.tab; render(); }
+      if (a === "profile-tab") { state.wb.profileTab = el.dataset.tab; state.wb.showAddSkill = false; state.wb.showAddSubagent = false; render(); }
+      if (a === "toggle-add-skill") { state.wb.showAddSkill = !state.wb.showAddSkill; state.wb.showAddSubagent = false; render(); }
+      if (a === "cancel-add-skill") { state.wb.showAddSkill = false; state.wb.newSkill = { name: "", desc: "", level: "Developing" }; render(); }
+      if (a === "save-skill") {
+        const name = state.wb.openAgent, p = PROFILES[name];
+        const sk = state.wb.newSkill;
+        if (!p || !sk.name.trim()) return;
+        if (!p.persona) p.persona = { skills: [] };
+        if (!p.persona.skills) p.persona.skills = [];
+        p.persona.skills.push({ name: sk.name.trim(), desc: sk.desc.trim() || "Custom skill.", level: sk.level || "Developing" });
+        state.wb.showAddSkill = false;
+        state.wb.newSkill = { name: "", desc: "", level: "Developing" };
+        render();
+      }
+      if (a === "remove-skill") {
+        const p = PROFILES[state.wb.openAgent];
+        if (p?.persona?.skills) p.persona.skills.splice(+el.dataset.i, 1);
+        render();
+      }
+      if (a === "toggle-add-subagent") { state.wb.showAddSubagent = !state.wb.showAddSubagent; state.wb.showAddSkill = false; render(); }
+      if (a === "cancel-add-subagent") { state.wb.showAddSubagent = false; state.wb.newSubagent = { name: "", emoji: "🤖", role: "" }; render(); }
+      if (a === "save-subagent") {
+        const name = state.wb.openAgent, p = PROFILES[name];
+        const sub = state.wb.newSubagent;
+        if (!p || !sub.name.trim()) return;
+        if (!p.subagents) p.subagents = [];
+        p.subagents.push({ name: sub.name.trim(), emoji: sub.emoji || "🛰️", role: sub.role.trim() || "Scoped task runner", status: "online" });
+        state.wb.showAddSubagent = false;
+        state.wb.newSubagent = { name: "", emoji: "🤖", role: "" };
+        render();
+      }
+      if (a === "remove-subagent") {
+        const p = PROFILES[state.wb.openAgent];
+        if (p?.subagents) p.subagents.splice(+el.dataset.i, 1);
+        render();
+      }
       if (a === "open-create-profile") { state.wb.showCreateProfile = true; render(); }
       if (a === "close-create-profile") { state.wb.showCreateProfile = false; render(); }
       if (a === "create-profile") {
@@ -973,6 +2019,7 @@
             boundaries: "Escalates tasks outside defined scope to the appropriate teammate.",
             tools: ["Snowflake"],
           },
+          subagents: [],
           status: "online", gateway: port, sessions: 0, isDefault: false,
           config: { provider: "Anthropic", model: "claude-sonnet-4", sources: ["Snowflake"], integrations: [] },
         };
@@ -982,10 +2029,23 @@
         state.wb.newProfile = { name: "", emoji: "🤖", role: "", soul: "" };
         loadProfileChat(name);
         state.wb.view = "agent";
+        state.wb.profileTab = "config";
         render();
       }
-      if (a === "open-wiki") { state.wb.view = "wiki"; state.wb.openWiki = el.dataset.wiki; render(); }
-      if (a === "toggle-kb") { state.wb.kbExpanded = !state.wb.kbExpanded; render(); }
+      if (a === "open-wiki") { state.wb.view = "wiki"; state.wb.openWiki = el.dataset.wiki; state.wb.openAsset = null; state.wb.chatContext = []; state.wb.chatFocused = false; render(); }
+      if (a === "open-asset") {
+        const asset = KB_ASSETS[el.dataset.asset];
+        if (!asset?.docId) return;
+        state.wb.view = "doc";
+        state.wb.openDoc = asset.docId;
+        state.wb.openAsset = asset.id;
+        state.wb.openWiki = asset.folderId;
+        state.wb.chatContext = [];
+        state.wb.chatFocused = false;
+        render();
+      }
+      if (a === "toggle-chat") { state.wb.askOpen = !state.wb.askOpen; render(); }
+      if (a === "exit-chat-focus") { state.wb.chatFocused = false; render(); }
       if (a === "dismiss-need") { state.wb.doneNeeds.push(+i); render(); }
       if (a === "db-send") sendChat("db", state.wb.dbInput);
       if (a === "db-quick") sendChat("db", t);
@@ -1005,6 +2065,12 @@
       if (e.target.dataset.action === "new-profile-field") {
         state.wb.newProfile[e.target.dataset.field] = e.target.value;
         render();
+      }
+      if (e.target.dataset.action === "skill-field") {
+        state.wb.newSkill[e.target.dataset.field] = e.target.value;
+      }
+      if (e.target.dataset.action === "subagent-field") {
+        state.wb.newSubagent[e.target.dataset.field] = e.target.value;
       }
     };
     app.onkeydown = e => {
