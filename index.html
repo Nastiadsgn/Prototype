@@ -26,6 +26,7 @@
     .flex-wrap { flex-wrap: wrap; }
     .h-screen { min-height: 100vh; }
     .overflow-hidden { overflow: hidden; }
+    .overflow-x-hidden { overflow-x: hidden; }
     .overflow-y-auto { overflow-y: auto; }
     .text-center { text-align: center; }
     .text-sm { font-size: .875rem; }
@@ -199,6 +200,8 @@
     .wb-pane-content {
       height: 100%;
       min-height: 0;
+      min-width: 0;
+      overflow-x: hidden;
       overflow-y: auto;
       padding: 20px;
     }
@@ -207,6 +210,8 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
+      min-width: 0;
+      overflow-x: hidden;
       overflow-y: auto;
       background: #fff;
       border: 1px solid #e4e4e7;
@@ -214,11 +219,16 @@
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
       padding: 1rem;
     }
+    .wb-pane-content > * {
+      min-width: 0;
+      max-width: 100%;
+    }
     .wb-setup-progress { flex-shrink: 0; width: 100%; }
     .wb-artifact-area {
       flex: 1;
       min-height: 0;
       width: 100%;
+      overflow-x: hidden;
       overflow-y: auto;
     }
     .wb-artifact-area > * { width: 100%; }
@@ -1024,7 +1034,6 @@
           <p class="text-xs text-zinc-400 mt-0.5">Don't see your source? Tell us what you need.</p>
         </button>
       </div>
-      ${c.selectedTool && c.phase !== "pick" ? connectionForm(c.selectedTool, key) : ""}
     </div>`;
   }
 
@@ -1253,13 +1262,13 @@
           <span class="text-xs text-violet-600 bg-violet-50 rounded-full px-2 py-0.5 ml-auto">Shared library · any agent can iterate</span>
         </div>`
       : "";
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full overflow-y-auto min-h-0 flex-1">
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full overflow-x-hidden overflow-y-auto min-h-0 flex-1">
       ${assetBanner}
-      <div class="flex items-start justify-between mb-1"><h1 class="text-2xl font-bold text-zinc-900">${esc(d.title)}</h1><div class="flex items-center gap-1.5 text-xs text-zinc-400">${ICON.clock}<span>Updated ${esc(d.updated)} by ${esc(d.agent)}</span></div></div>
+      <div class="flex items-start justify-between gap-3 mb-1 flex-wrap"><h1 class="text-2xl font-bold text-zinc-900 min-w-0 flex-1">${esc(d.title)}</h1><div class="flex items-center gap-1.5 text-xs text-zinc-400 shrink-0">${ICON.clock}<span>Updated ${esc(d.updated)} by ${esc(d.agent)}</span></div></div>
       <p class="text-[11px] text-zinc-400 mb-3">Click any section to add it as chat context</p>
       <p class="text-sm text-zinc-400 mb-8 rounded-lg px-1 -mx-1${ctxActive(d.subtitle)}" ${ctxAction(d.subtitle)}>${esc(d.subtitle)}</p>
       <div class="bg-zinc-50/[0.01] border border-zinc-200 rounded-2xl p-5 mb-8"><div class="flex items-center gap-2 mb-4"><span>${emoji}</span><h2 class="text-xs font-semibold text-zinc-400 uppercase tracking-widest">While you were away, ${esc(d.agent)}:</h2></div>
-      ${d.feed.map(c=>{const t=`${d.agent}: ${c.action}`;return `<div class="flex items-start gap-2.5 mb-2 rounded-lg px-1 -mx-1${ctxActive(t)}" ${ctxAction(t)}><span class="text-violet-400 mt-0.5">${ICON.check.replace('w-4','w-3.5')}</span><p class="text-sm text-zinc-600 flex-1">${esc(c.action)}</p><p class="text-xs text-zinc-300">${esc(c.time)}</p></div>`;}).join("")}</div>
+      ${d.feed.map(c=>{const t=`${d.agent}: ${c.action}`;return `<div class="flex items-start gap-2.5 mb-2 rounded-lg px-1 -mx-1${ctxActive(t)}" ${ctxAction(t)}><span class="text-violet-400 mt-0.5 shrink-0">${ICON.check.replace('w-4','w-3.5')}</span><p class="text-sm text-zinc-600 flex-1 min-w-0">${esc(c.action)}</p><p class="text-xs text-zinc-300 shrink-0">${esc(c.time)}</p></div>`;}).join("")}</div>
       <h2 class="text-base font-bold mb-3">Summary</h2><p class="text-sm text-zinc-600 leading-relaxed mb-8 rounded-lg px-1 -mx-1${ctxActive(d.summary)}" ${ctxAction(d.summary)}>${esc(d.summary)}</p>
       <div class="grid grid-cols-2 gap-3 mb-6">${d.metrics.map(k=>{const t=`${k.metric}: ${k.value} (${k.change})`;return `<div class="rounded-xl border p-4 ${k.flagged?"border-zinc-200 bg-red-50/40":"border-zinc-200"}${ctxActive(t)}" ${ctxAction(t)}><p class="text-xs text-zinc-400 mb-1">${esc(k.metric)}</p><div class="flex items-end justify-between"><div><p class="text-xl font-bold">${esc(k.value)}</p><p class="text-xs ${k.dir==="up"?"text-green-500":"text-red-400"}">${esc(k.change)}</p></div>${sparkline(k.spark, k.dir!=="up")}</div></div>`;}).join("")}</div>
       <div class="bg-violet-50/70 border border-violet-200 rounded-xl px-4 py-3 mb-8${ctxActive(d.annotation.text)}" ${ctxAction(d.annotation.text)}>${ICON.sparkles}<p class="text-xs font-semibold text-violet-500 mt-1">${esc(d.agent)} noticed</p><p class="text-sm text-zinc-700 mt-1">${esc(d.annotation.text)}</p></div>
@@ -1275,7 +1284,7 @@
       </div></div></div>`;
     }
     const assets = folderAssets(folder.id);
-    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full overflow-y-auto min-h-0 flex-1">
+    return `<div class="wb-pane"><div class="wb-pane-content"><div class="w-full overflow-x-hidden overflow-y-auto min-h-0 flex-1">
       <h1 class="text-2xl font-bold mb-2"><span>${folder.icon}</span> ${esc(folder.title)}</h1>
       ${folder.goal ? `<p class="text-xs text-violet-600 bg-violet-50 inline-block rounded-full px-2.5 py-0.5 mb-3">Goal: ${esc(folder.goal)}</p>` : ""}
       <p class="text-sm text-zinc-600 leading-relaxed">${esc(folder.intro || "Agent-produced assets — shared across the fleet.")}</p>
@@ -1947,8 +1956,10 @@
       if (a === "edit-plan") obSend("I'd like to change something");
       if (a === "conn-pick") {
         const key = el.dataset.key, tool = el.dataset.tool;
-        state.ob.conn[key] = { ...(state.ob.conn[key] || {}), selectedTool: tool, phase: "input", accountId: "" };
+        state.ob.conn[key] = { selectedTool: tool, phase: "done", accountId: "" };
+        state.ob.dataSource = tool;
         render();
+        setTimeout(() => obSend(tool + " connected"), 400);
       }
       if (a === "conn-request") {
         state.ob.messages.push(
